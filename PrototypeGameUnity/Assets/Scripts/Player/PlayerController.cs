@@ -33,9 +33,7 @@ public class PlayerController : MonoBehaviour
             jumpCount = 0;
         }
 
-
         float move = Input.GetAxis("Horizontal");
-        //float jump = Input.GetKey("Jump");
 
         _rigidbody.velocity = new Vector2(move * Speed, _rigidbody.velocity.y);
     }
