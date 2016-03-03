@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Game;
+using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public Transform player;
+    public Transform playerToCalibrateCameraOffset;
     public float smoothingX = 5f;
     public float smoothingY = 5f;
 
@@ -12,12 +13,14 @@ public class CameraMovement : MonoBehaviour
     //***********************************
     void Start()
     {
-        offset = transform.position - player.position;
+        offset = transform.position - playerToCalibrateCameraOffset.position;
     }
 
     void FixedUpdate()
     {
-        var targetCamPos = player.position + offset;
+        var currentPlayerTransform = GameLogic.Instance.GetCurrentPlayer().transform;
+
+        var targetCamPos = currentPlayerTransform.position + offset;
 
         transform.position = new Vector3(
             Mathf.Lerp(transform.position.x, targetCamPos.x, smoothingX),

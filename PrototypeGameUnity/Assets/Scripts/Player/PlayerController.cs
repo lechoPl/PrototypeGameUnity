@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Game;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
@@ -17,16 +18,21 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     private int jumpCount = 0;
 
-
     // MonoBehavior methods
     //***********************************
     void Start()
     {
+        GameLogic.Instance.RegisterPlayer(this);
         _rigidbody = GetComponent<Rigidbody2D>();
     }
 
     void FixedUpdate()
     {
+        if (GameLogic.Instance.GetCurrentPlayer() != this)
+        {
+            return;
+        }
+
         isGrounded = Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadius, GroundMask);
         if (isGrounded)
         {
@@ -40,11 +46,30 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (GameLogic.Instance.GetCurrentPlayer() != this)
+        {
+            return;
+        }
+
         if ((isGrounded || jumpCount < maxJumpCount-1) && Input.GetButtonDown("Jump"))
         {
-            isGrounded = false;
-            ++jumpCount;
-            _rigidbody.AddForce(new Vector2(0f, jumpForce));
+            Jump();
         }
+    }
+
+    // Public methods
+    //***********************************
+    public void SetPlayerName(string name)
+    {
+        this.name = name;
+    }
+
+    // Private methods
+    //***********************************
+    public void Jump()
+    {
+        isGrounded = false;
+        ++jumpCount;
+        _rigidbody.AddForce(new Vector2(0f, jumpForce));
     }
 }

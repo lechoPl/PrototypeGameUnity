@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Assets.Scripts.Game;
+using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
@@ -14,6 +14,13 @@ public class GameController : MonoBehaviour
     {
         CheckInput();
 	}
+
+    // MonoBehavior methods
+    //***********************************
+    public void EndRound()
+    {
+        GameLogic.Instance.EndRound();
+    }
 
     // Private methods
     //***********************************
