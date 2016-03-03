@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
     //***********************************
     private void CheckInput()
     {
-        if (Input.GetKeyUp(KeyCode.Tab))
+        if (Input.GetKeyUp(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Tab))
         {
             SwitchUI();
         }
