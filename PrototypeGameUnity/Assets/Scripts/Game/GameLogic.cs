@@ -11,6 +11,9 @@ namespace Assets.Scripts.Game
         //***********************************
         public int CurrentPlayer { get; private set; }
 
+		private float RoundStart = -1;
+		private float RoundTime = 65;
+
         public void RegisterPlayer(PlayerController player)
         {
             if (!Players.Contains(player))
@@ -29,10 +32,29 @@ namespace Assets.Scripts.Game
             return Players[CurrentPlayer];
         }
 
+		public void StartRound() {
+			RoundStart = Time.time;
+		}
+
         public void EndRound()
         {
             CurrentPlayer = (CurrentPlayer + 1) % Players.Count;
+			StartRound ();
         }
+
+		public float GetRoundTime() {
+			return Time.time - RoundStart;
+		}
+
+		public float GetTimeLeft() {
+			return RoundTime - GetRoundTime();
+		}
+
+		public void ChechRoundFinished() {
+			if (Time.time - RoundStart >= RoundTime) {
+				EndRound ();
+			}
+		}
 
         // Private methods
         //***********************************

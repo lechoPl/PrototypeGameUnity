@@ -7,12 +7,12 @@ public class GameController : MonoBehaviour
     public GameObject GameMenuPanel;
     public GameObject MoveUI;
 
-
     // MonoBehavior methods
     //***********************************
     void Update ()
     {
         CheckInput();
+
 	}
 
     // MonoBehavior methods
@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
     //***********************************
     private void CheckInput()
     {
-        if (Input.GetKeyUp(KeyCode.Tab))// || Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyUp(KeyCode.Escape))// || Input.GetKeyDown(KeyCode.Tab))
         {
             SwitchUI();
         }
