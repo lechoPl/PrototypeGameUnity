@@ -22,8 +22,10 @@ public class UIController : MonoBehaviour {
 
 	
 	private void RefreshTimer() {
-		GameLogic.Instance.ChechRoundFinished ();	
-		TimeLabel.text = GetTimeLeftString ();
+		if (GameLogic.Instance.GetTimeLeft() >= 0) {
+			GameLogic.Instance.ChechRoundFinished ();	
+			TimeLabel.text = GetTimeLeftString ();
+		}
 	}
 
 	

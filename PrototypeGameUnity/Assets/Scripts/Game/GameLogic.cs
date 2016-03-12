@@ -12,7 +12,7 @@ namespace Assets.Scripts.Game
         public int CurrentPlayer { get; private set; }
 
 		private float RoundStart = -1;
-		private float RoundTime = 65;
+		private float RoundTime = 15;
 
         public void RegisterPlayer(PlayerController player)
         {
@@ -39,7 +39,6 @@ namespace Assets.Scripts.Game
         public void EndRound()
         {
             CurrentPlayer = (CurrentPlayer + 1) % Players.Count;
-			StartRound ();
         }
 
 		public float GetRoundTime() {

@@ -22,6 +22,12 @@ public class GameController : MonoBehaviour
         GameLogic.Instance.EndRound();
     }
 
+	public void StartRound() {
+		GameLogic.Instance.EndRound ();
+		GameLogic.Instance.StartRound();
+		SwitchUI ();
+	}
+
     // Private methods
     //***********************************
     private void CheckInput()

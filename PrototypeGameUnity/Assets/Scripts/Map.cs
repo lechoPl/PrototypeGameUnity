@@ -20,7 +20,7 @@ public class Map : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		init ();
+		//init ();
 	}
 
 	private void init() {
@@ -35,7 +35,7 @@ public class Map : MonoBehaviour {
 			//gameObject.AddComponent(field);
 
 			GameObject field = (GameObject)Instantiate(fieldPrefab);
-			field.transform.parent = this.gameObject.transform;
+			field.transform.SetParent(this.gameObject.transform);
 
 			int offset;
 			if(i <FIELDS_AMOUNT/4) {
