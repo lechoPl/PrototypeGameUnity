@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts.Game
@@ -6,6 +7,7 @@ namespace Assets.Scripts.Game
     public class GameLogic
     {
         private IList<PlayerController> Players { get; set; }
+        private IList<Field> Fields { get; set; }
 
         // Public methods
         //***********************************
@@ -24,6 +26,35 @@ namespace Assets.Scripts.Game
             }
         }
 
+        public void RemovePlayer(PlayerController player)
+        {
+            if (Players.Contains(player))
+            {
+                Players.Remove(player);
+            }
+        }
+
+        public void RegisterFiled(Field field)
+        {
+            if (!Fields.Contains(field))
+            {
+                field.SetFieldName(string.Format("Field {0}", Fields.Count));
+                Fields.Add(field);
+            }
+            else
+            {
+                Debug.Log(string.Format("RegisterFiled: {0} is already registered", field.name));
+            }
+        }
+
+        public void RemoveField(Field field)
+        {
+            if (Fields.Contains(field))
+            {
+                Fields.Remove(field);
+            }
+        }
+
         public PlayerController GetCurrentPlayer()
         {
             return Players[CurrentPlayer];
@@ -34,11 +65,33 @@ namespace Assets.Scripts.Game
             CurrentPlayer = (CurrentPlayer + 1) % Players.Count;
         }
 
+        public IList<PlayerController> GetPlayersOnField(int fieldNumber)
+        {
+            if(fieldNumber < 0 || fieldNumber >= Fields.Count)
+            {
+                return null;
+            }
+
+            var field = Fields[fieldNumber];
+
+            var top = field.transform.position.y + field.Height / 2f;
+            var down = field.transform.position.y - field.Height / 2f;
+            var left = field.transform.position.x - field.Width / 2f;
+            var right = field.transform.position.x + field.Width / 2f;
+
+            return Players.Where(p => 
+                top > p.transform.position.y &&
+                down < p.transform.position.y &&
+                left < p.transform.position.x &&
+                right > p.transform.position.x).ToList();
+        }
+
         // Private methods
         //***********************************
         private GameLogic()
         {
             Players = new List<PlayerController>();
+            Fields = new List<Field>();
         }
 
 

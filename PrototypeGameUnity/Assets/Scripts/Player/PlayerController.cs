@@ -26,6 +26,11 @@ public class PlayerController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody2D>();
     }
 
+    void OnDestroy()
+    {
+        GameLogic.Instance.RemovePlayer(this);
+    }
+
     void FixedUpdate()
     {
         if (GameLogic.Instance.GetCurrentPlayer() != this)
