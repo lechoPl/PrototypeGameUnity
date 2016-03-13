@@ -7,12 +7,12 @@ public class GameController : MonoBehaviour
     public GameObject GameMenuPanel;
     public GameObject MoveUI;
 
-
     // MonoBehavior methods
     //***********************************
     void Update ()
     {
         CheckInput();
+		GameLogic.Instance.ChechRoundFinished ();
 	}
 
     // MonoBehavior methods
@@ -22,11 +22,15 @@ public class GameController : MonoBehaviour
         GameLogic.Instance.EndRound();
     }
 
+	public void StartRound() {
+
+	}
+
     // Private methods
     //***********************************
     private void CheckInput()
     {
-        if (Input.GetKeyUp(KeyCode.Tab))// || Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyUp(KeyCode.Escape))// || Input.GetKeyDown(KeyCode.Tab))
         {
             SwitchUI();
         }

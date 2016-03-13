@@ -6,12 +6,18 @@ namespace Assets.Scripts.Game
 {
     public class GameLogic
     {
+		private static int DiceTimeMultiplier = 5;
         private IList<PlayerController> Players { get; set; }
         private IList<Field> Fields { get; set; }
 
         // Public methods
         //***********************************
         public int CurrentPlayer { get; private set; }
+
+		private float roundStart = 0;
+		private float roundTime = 0;
+
+		public bool MovementBlocked { get; private set; }
 
         public void RegisterPlayer(PlayerController player)
         {
@@ -60,6 +66,12 @@ namespace Assets.Scripts.Game
             return Players[CurrentPlayer];
         }
 
+		public void StartRound(int DiceValue) {
+			roundStart = Time.time;
+			roundTime = DiceTimeMultiplier * DiceValue;
+			MovementBlocked = false;
+		}
+
         public void EndRound()
         {
             CurrentPlayer = (CurrentPlayer + 1) % Players.Count;
@@ -85,6 +97,24 @@ namespace Assets.Scripts.Game
                 left < p.transform.position.x &&
                 right > p.transform.position.x).ToList();
         }
+
+		public float GetRoundTime() {
+			return Time.time - roundStart;
+		}
+
+		public float GetTimeLeft() {
+			return roundTime - GetRoundTime();
+		}
+
+		public void ChechRoundFinished() {
+			if (GetTimeLeft() <= 0) {
+				BlockMovement();
+			}
+		}
+
+		private void BlockMovement() {
+			MovementBlocked = true;
+		}
 
         // Private methods
         //***********************************
