@@ -1,37 +1,63 @@
 ﻿using UnityEngine;
-using System.Collections;
-
 using UnityEngine.UI;
 using Assets.Scripts.Game;
 
-public class UIController : MonoBehaviour {
-	public GameObject GameMenuPanel;
+public class UIController : MonoBehaviour
+{
+    public GameObject GameMenuPanel;
 	public GameObject MoveUIPanel;
 
 	public Text TimeLabel;
 
-	// Use this for initialization
-	void Start () {
+    // MonoBehavior methods
+    //***********************************
+    void Start ()
+    {
 
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		RefreshTimer ();
-	}
+	void Update ()
+    {
+        CheckInput();
+        RefreshTimer();
+    }
 
-	
-	private void RefreshTimer() {
-		if (GameLogic.Instance.GetTimeLeft() >= 0) {
+    // Private methods
+    //***********************************
+    private void RefreshTimer()
+    {
+		if (GameLogic.Instance.GetTimeLeft() >= 0)
+        {
 			TimeLabel.text = GetTimeLeftString ();
 		}
 	}
-
 	
-	private string GetTimeLeftString() {
+	private string GetTimeLeftString()
+    {
 		float timeLeft = GameLogic.Instance.GetTimeLeft ();
 		int minutes = (int) Mathf.Abs(timeLeft / 60);
 		int seconds = (int) Mathf.Abs(timeLeft - minutes * 60);
 		return string.Format("{0:00}:{1:00}", minutes, seconds);
 	}
+
+    private void CheckInput()
+    {
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            SwitchUI();
+        }
+    }
+
+    private void SwitchUI()
+    {
+        if (GameMenuPanel != null)
+        {
+            GameMenuPanel.SetActive(!GameMenuPanel.activeSelf);
+        }
+
+        if (MoveUIPanel != null)
+        {
+            MoveUIPanel.SetActive(!GameMenuPanel.activeSelf);
+        }
+    }
 }

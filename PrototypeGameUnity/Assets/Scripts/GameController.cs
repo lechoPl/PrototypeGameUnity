@@ -3,10 +3,6 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    [Header("UI")]
-    public GameObject GameMenuPanel;
-    public GameObject MoveUI;
-
     // MonoBehavior methods
     //***********************************
     void Update ()
@@ -15,7 +11,7 @@ public class GameController : MonoBehaviour
 		GameLogic.Instance.ChechRoundFinished ();
 	}
 
-    // MonoBehavior methods
+    // Public methods
     //***********************************
     public void EndRound()
     {
@@ -30,22 +26,6 @@ public class GameController : MonoBehaviour
     //***********************************
     private void CheckInput()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))// || Input.GetKeyDown(KeyCode.Tab))
-        {
-            SwitchUI();
-        }
-    }
-
-    private void SwitchUI()
-    {
-        if(GameMenuPanel != null)
-        {
-            GameMenuPanel.SetActive(!GameMenuPanel.activeSelf);
-        }
-
-        if(MoveUI != null)
-        {
-            MoveUI.SetActive(!GameMenuPanel.activeSelf);
-        }
+        //nothing
     }
 }
