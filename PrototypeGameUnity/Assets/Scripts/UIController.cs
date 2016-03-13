@@ -12,7 +12,7 @@ public class UIController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		GameLogic.Instance.StartRound ();
+
 	}
 	
 	// Update is called once per frame
@@ -23,7 +23,6 @@ public class UIController : MonoBehaviour {
 	
 	private void RefreshTimer() {
 		if (GameLogic.Instance.GetTimeLeft() >= 0) {
-			GameLogic.Instance.ChechRoundFinished ();	
 			TimeLabel.text = GetTimeLeftString ();
 		}
 	}

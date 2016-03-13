@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 
+using Assets.Scripts.Game;
+
 public class DiceScript : MonoBehaviour {
 	public Image Dice;
 
@@ -11,7 +13,7 @@ public class DiceScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		RollDice ();
+		RollNumber = 1;
 	}
 	
 	// Update is called once per frame
@@ -27,6 +29,9 @@ public class DiceScript : MonoBehaviour {
 		RollNumber = (int) Mathf.Floor(Random.Range (1, diceTextures.Length)) + 1;
 		print (RollNumber);
 		Dice.sprite = diceTextures [RollNumber-1];
+		
+		GameLogic.Instance.EndRound ();
+		GameLogic.Instance.StartRound(RollNumber);
 	}
 
 }

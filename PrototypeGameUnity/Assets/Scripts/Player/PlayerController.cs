@@ -33,6 +33,10 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+		if (GameLogic.Instance.MovementBlocked) {
+			return;
+		}
+
         isGrounded = Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadius, GroundMask);
         if (isGrounded)
         {
@@ -50,6 +54,10 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
+		if (GameLogic.Instance.MovementBlocked) {
+			return;
+		}
 
         if ((isGrounded || jumpCount < maxJumpCount-1) && Input.GetButtonDown("Jump"))
         {

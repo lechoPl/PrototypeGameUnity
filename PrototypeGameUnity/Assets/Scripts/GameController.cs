@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour
     void Update ()
     {
         CheckInput();
-
+		GameLogic.Instance.ChechRoundFinished ();
 	}
 
     // MonoBehavior methods
@@ -23,9 +23,7 @@ public class GameController : MonoBehaviour
     }
 
 	public void StartRound() {
-		GameLogic.Instance.EndRound ();
-		GameLogic.Instance.StartRound();
-		SwitchUI ();
+
 	}
 
     // Private methods
