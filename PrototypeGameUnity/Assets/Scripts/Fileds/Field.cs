@@ -31,7 +31,16 @@ public class Field : MonoBehaviour
             setupBoundsHeight();
         }
     }
+    public Vector3 SartPointPosition
+    {
+        get
+        {
+            return _startPoint.transform.position;
+        }
+    }
 
+    private GameObject _startPoint;
+    private EndPoint _endPoint;
     private GameObject TopBound;
     private GameObject DownBound;
     private GameObject LeftBound;
@@ -54,6 +63,27 @@ public class Field : MonoBehaviour
     public void SetFieldName(string name)
     {
         this.name = name;
+    }
+
+    public void AddStartPoint(GameObject sp, Vector3 pos)
+    {
+        _startPoint = GameObject.Instantiate(sp);
+        _startPoint.transform.position = pos;
+        _startPoint.transform.parent = transform;
+    }
+
+    public void AddEndPoint(EndPoint ep, Vector3 pos, int nextFieldId)
+    {
+        if(ep == null)
+        {
+            Debug.Log("Wrong EndPoint");
+            return;
+        }
+
+        _endPoint = GameObject.Instantiate(ep);
+        _endPoint.transform.position = pos;
+        _endPoint.transform.parent = transform;
+        _endPoint.NextFieldID = nextFieldId;
     }
 
     // Private methods

@@ -12,6 +12,11 @@ namespace Assets.Scripts.Game
 
         // Public methods
         //***********************************
+        public void PlayerToNextField(PlayerController p, int FieldId)
+        {
+            p.transform.position = Fields[FieldId].SartPointPosition;
+        }
+
         public int CurrentPlayer { get; private set; }
 
 		private float roundStart = 0;
