@@ -1,35 +1,20 @@
 ﻿using Assets.Scripts.Game;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Field : MonoBehaviour
 {
-    private int _width;
-    public int Width
+    public int Width;
+    public void SetWidth(int val)
     {
-        get
-        {
-            return _width;
-        }
-
-        set
-        {
-            _width = value;
-            setupBoundsWidth();
-        }
+        Width = val;
+        SetupBoundsWidth();
     }
-    private int _height;
-    public int Height
+    public int Height;
+    public void SetHeight(int val)
     {
-        get
-        {
-            return _height;
-        }
-        
-        set
-        {
-            _height = value;
-            setupBoundsHeight();
-        }
+        Height = val;
+        SetupBoundsHeight();
     }
     public Vector3 SartPointPosition
     {
@@ -50,6 +35,9 @@ public class Field : MonoBehaviour
     //***********************************
     void Awake ()
     {
+        Clear();
+        SetupBoundsWidth();
+        SetupBoundsHeight();
         GameLogic.Instance.RegisterFiled(this);
 	}
 
@@ -86,28 +74,44 @@ public class Field : MonoBehaviour
         _endPoint.NextFieldID = nextFieldId;
     }
 
-    // Private methods
-    //***********************************
-    private void setupBoundsWidth()
+    public void SetupBoundsWidth()
     {
         CheckBounds();
 
         TopBound.transform.localScale += (-TopBound.transform.localScale) + new Vector3(Width, 1f, 1f);
         DownBound.transform.localScale += (-DownBound.transform.localScale) + new Vector3(Width, 1f, 1f);
-        LeftBound.transform.position = new Vector3(-Width / 2f, 0f, 0f);
-        RightBound.transform.position = new Vector3(Width / 2f, 0f, 0f);
+        LeftBound.transform.position += new Vector3(-Width / 2f, 0f, 0f);
+        RightBound.transform.position += new Vector3(Width / 2f, 0f, 0f);
     }
 
-    private void setupBoundsHeight()
+    public void SetupBoundsHeight()
     {
         CheckBounds();
 
-        TopBound.transform.position = new Vector3(0f, Height / 2f, 0f);
-        DownBound.transform.position = new Vector3(0f, -Height / 2f, 0f);
+        TopBound.transform.position += new Vector3(0f, Height / 2f, 0f);
+        DownBound.transform.position += new Vector3(0f, -Height / 2f, 0f);
         LeftBound.transform.localScale += (-LeftBound.transform.localScale) + new Vector3(1f, Height, 1f);
         RightBound.transform.localScale += (-RightBound.transform.localScale) + new Vector3(1f, Height, 1f);
     }
 
+    public void Clear()
+    {
+
+        var childsToDestroy = new List<GameObject>();
+
+        for (int i = 0; i < transform.childCount; ++i)
+        {
+            childsToDestroy.Add(transform.GetChild(i).gameObject);
+        }
+
+        foreach (var child in childsToDestroy)
+        {
+            DestroyImmediate(child);
+        }
+    }
+
+    // Private methods
+    //***********************************
     private void CheckBounds()
     {
         if (TopBound == null)
@@ -138,7 +142,8 @@ public class Field : MonoBehaviour
         DestroyImmediate(bound.GetComponent<BoxCollider>());
         bound.AddComponent(typeof(BoxCollider2D));
         bound.name = string.Format(name);
-        bound.transform.parent = this.transform;
+        bound.transform.position = transform.position;
+        bound.transform.parent = transform;
 
         return bound;
     }

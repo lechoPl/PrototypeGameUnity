@@ -30,6 +30,11 @@ namespace Assets.Scripts.Game
             {
                 player.SetPlayerName(string.Format("Player {0}", Players.Count));
                 Players.Add(player);
+
+                if (Fields.Count > 0)
+                {
+                    PlayerToNextField(player, 0);
+                }
             }
             else
             {
@@ -55,6 +60,14 @@ namespace Assets.Scripts.Game
             else
             {
                 Debug.Log(string.Format("RegisterFiled: {0} is already registered", field.name));
+            }
+
+            if(Fields.Count == 1)
+            {
+                foreach(var player in Players)
+                {
+                    PlayerToNextField(player, 0);
+                }
             }
         }
 

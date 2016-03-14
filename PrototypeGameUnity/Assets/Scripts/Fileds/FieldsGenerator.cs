@@ -1,53 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Scripts.Common;
+using Assets.Scripts.Fileds.ValueObjects;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class FieldsGenerator : MonoBehaviour
 {
     [Range(0, 50)]
     public int NumberOfFields = 1;
-    public int Width;
-    public int Height;
-    private float Radius;
+    public bool refreshOnly;
 
-    public GameObject StartPoint;
-    public float StartPointX;
-    public float StartPointY;
-    public EndPoint EndPoint;
-    public float EndPointX;
-    public float EndPointY;
+    [HideInInspector()]
+    public bool prefabsExpended = false;
+    [HideInInspector()]
+    public List<FieldPrefab> PrefabLists = new List<FieldPrefab>();
 
+
+    private float RadiusX;
+    private float RadiusY;
+
+    // MonoBehaviour methods
+    //***********************************
     void Start ()
     {
         ClearFields();
         CreateFields();
     }
 	
-	void Update ()
-    {
-	
-	}
-
+    // Public methods
+    //***********************************
     public void CreateFields()
     {
-        if (NumberOfFields == 0)
+        if (NumberOfFields == 0 || PrefabLists == null)
         {
             return;
         }
 
-        Radius = Mathf.Sqrt(2) * Mathf.Max(Width, Height) * (NumberOfFields - 1) / 4f;
+        var fieldMaxWidth = PrefabLists.Max(f => f.Prefab.Width);
+        var fieldMaxHeight = PrefabLists.Max(f => f.Prefab.Height);
+        RadiusX = fieldMaxWidth * (NumberOfFields - 1) / 2f;
+        RadiusY = fieldMaxHeight * (NumberOfFields - 1) / 2f;
 
         int id = 0;
-        for (float i = 0; i < 360.0f; i = i + 360.0f/NumberOfFields)
+        for (float i = 0; i < 360.0f; i = i + 360.0f / NumberOfFields)
         {
-            var newField = new GameObject(string.Format("Field {0} - not registered", id));
-            newField.AddComponent<Field>();
-            var field = newField.GetComponent<Field>();
+            var fieldPrefab = PrefabLists[Utilities.rand.Next(PrefabLists.Count)].Prefab;
+            var fieldPosition = this.transform.position + new Vector3(RadiusX * Mathf.Cos(i * Mathf.Deg2Rad), RadiusY * Mathf.Sin(i * Mathf.Deg2Rad), 0f);
 
-            field.Width = Width;
-            field.Height = Height;
-            field.AddStartPoint(StartPoint, new Vector3(StartPointX, StartPointY, 0f));
-            field.AddEndPoint(this.EndPoint, new Vector3(EndPointX, EndPointY, 0f), id == NumberOfFields - 1 ? 0 : id + 1);
-            newField.transform.position = this.transform.position + new Vector3(Radius * Mathf.Cos(i * Mathf.Deg2Rad), Radius * Mathf.Sin(i * Mathf.Deg2Rad), 0f);
+            var field = Instantiate(fieldPrefab, fieldPosition, Quaternion.Euler(0, 0, 0)) as Field;
+            field.gameObject.name = string.Format("Field {0} - not registered - ({1})", id, fieldPrefab.gameObject.name);
             field.transform.parent = this.transform;
 
             id++;
