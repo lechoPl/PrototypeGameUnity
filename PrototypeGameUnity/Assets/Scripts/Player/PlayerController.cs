@@ -72,6 +72,16 @@ public class PlayerController : MonoBehaviour
 
     // Public methods
     //***********************************
+    public void ResetVelocity()
+    {
+        if(_rigidbody == null)
+        {
+            return;
+        }
+
+        _rigidbody.velocity = Vector3.zero;
+    }
+
     public void SetPlayerName(string name)
     {
         this.name = name;

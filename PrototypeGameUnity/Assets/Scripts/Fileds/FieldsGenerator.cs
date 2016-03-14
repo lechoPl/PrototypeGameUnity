@@ -49,6 +49,7 @@ public class FieldsGenerator : MonoBehaviour
 
             var field = Instantiate(fieldPrefab, fieldPosition, Quaternion.Euler(0, 0, 0)) as Field;
             field.gameObject.name = string.Format("Field {0} - not registered - ({1})", id, fieldPrefab.gameObject.name);
+            field.SetEndPointNextFieldId(id == NumberOfFields - 1 ? 0 : id + 1);
             field.transform.parent = this.transform;
 
             id++;

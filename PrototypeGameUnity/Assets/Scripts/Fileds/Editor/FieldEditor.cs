@@ -12,7 +12,7 @@ public class FieldEditor : Editor
         {
             var fieldsGenerator = target as Field;
 
-            fieldsGenerator.Clear();
+            fieldsGenerator.ClearBounds();
             fieldsGenerator.SetupBoundsWidth();
             fieldsGenerator.SetupBoundsHeight();
         }

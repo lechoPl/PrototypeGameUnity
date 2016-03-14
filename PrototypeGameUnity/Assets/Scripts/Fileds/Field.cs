@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Game;
+﻿using Assets.Scripts.Common;
+using Assets.Scripts.Game;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,12 +21,21 @@ public class Field : MonoBehaviour
     {
         get
         {
-            return _startPoint.transform.position;
+            if(_startPoint == null)
+            {
+                return Vector3.zero;
+            }
+            else
+            {
+                return _startPoint.transform.position;
+            }
         }
     }
 
     private GameObject _startPoint;
     private EndPoint _endPoint;
+
+    private GameObject Bounds;
     private GameObject TopBound;
     private GameObject DownBound;
     private GameObject LeftBound;
@@ -35,9 +45,8 @@ public class Field : MonoBehaviour
     //***********************************
     void Awake ()
     {
-        Clear();
-        SetupBoundsWidth();
-        SetupBoundsHeight();
+        ClearBounds();
+        Setup();
         GameLogic.Instance.RegisterFiled(this);
 	}
 
@@ -74,6 +83,25 @@ public class Field : MonoBehaviour
         _endPoint.NextFieldID = nextFieldId;
     }
 
+    public void SetEndPointNextFieldId(int nexFieldId)
+    {
+        if(_endPoint == null)
+        {
+            return;
+        }
+
+        _endPoint.NextFieldID = nexFieldId;
+    }
+
+    public void Setup()
+    {
+        SetupStartPoint();
+        SetupEndPoint();
+
+        SetupBoundsWidth();
+        SetupBoundsHeight();
+    }
+
     public void SetupBoundsWidth()
     {
         CheckBounds();
@@ -94,14 +122,18 @@ public class Field : MonoBehaviour
         RightBound.transform.localScale += (-RightBound.transform.localScale) + new Vector3(1f, Height, 1f);
     }
 
-    public void Clear()
+    public void ClearBounds()
     {
+        if(Bounds == null)
+        {
+            return;
+        }
 
         var childsToDestroy = new List<GameObject>();
 
-        for (int i = 0; i < transform.childCount; ++i)
+        for (int i = 0; i < Bounds.transform.childCount; ++i)
         {
-            childsToDestroy.Add(transform.GetChild(i).gameObject);
+            childsToDestroy.Add(Bounds.transform.GetChild(i).gameObject);
         }
 
         foreach (var child in childsToDestroy)
@@ -112,8 +144,23 @@ public class Field : MonoBehaviour
 
     // Private methods
     //***********************************
+    private void SetupStartPoint()
+    {
+        _startPoint = Utilities.FindChildWithTag(this.gameObject, "StartPoint");
+    }
+
+    public void SetupEndPoint()
+    {
+        _endPoint = Utilities.FindComponentInChildWithTag<EndPoint>(this.gameObject, "EndPoint");
+    }
+
     private void CheckBounds()
     {
+        if(Bounds == null)
+        {
+            Bounds = CreateEmpy("Bounds");
+        }
+
         if (TopBound == null)
         {
             TopBound = CreateBound("Bound Top");
@@ -135,6 +182,16 @@ public class Field : MonoBehaviour
         }
     }
 
+    private GameObject CreateEmpy(string name)
+    {
+        var empty = new GameObject(name);
+
+        empty.transform.position = transform.position;
+        empty.transform.parent = transform;
+
+        return empty;
+    }
+
     private GameObject CreateBound(string name)
     {
         var bound = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -143,7 +200,7 @@ public class Field : MonoBehaviour
         bound.AddComponent(typeof(BoxCollider2D));
         bound.name = string.Format(name);
         bound.transform.position = transform.position;
-        bound.transform.parent = transform;
+        bound.transform.parent = Bounds.transform;
 
         return bound;
     }

@@ -14,6 +14,7 @@ namespace Assets.Scripts.Game
         //***********************************
         public void PlayerToNextField(PlayerController p, int FieldId)
         {
+            p.ResetVelocity();
             p.transform.position = Fields[FieldId].SartPointPosition;
         }
 
@@ -81,6 +82,11 @@ namespace Assets.Scripts.Game
 
         public PlayerController GetCurrentPlayer()
         {
+            if(CurrentPlayer < 0 || CurrentPlayer >= Players.Count)
+            {
+                return null;
+            }
+
             return Players[CurrentPlayer];
         }
 
