@@ -57,7 +57,7 @@ public class UIController : MonoBehaviour
 
         if (MoveUIPanel != null)
         {
-            MoveUIPanel.SetActive(!GameMenuPanel.activeSelf);
+            //MoveUIPanel.SetActive(!GameMenuPanel.activeSelf);
         }
     }
 }
