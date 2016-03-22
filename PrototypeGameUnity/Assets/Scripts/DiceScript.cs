@@ -5,10 +5,21 @@ using System.Collections;
 using Assets.Scripts.Game;
 
 public class DiceScript : MonoBehaviour {
+	private static Vector2 RotationOffset = new Vector2 (10, -10);
+	private static Vector3 RotationVector = new Vector3 (720 + RotationOffset.x, 720 + RotationOffset.y, 0);
 	private const float RotationTime = 2;
 	
 	private float rollStartTime = -RotationTime;
 	private Vector3 rollRotation;
+
+	private Vector3[] Rolls = new Vector3[]{
+		new Vector3(270, 0, 0),
+		new Vector3(0, 0, 0),
+		new Vector3(90, 0, 0),
+		new Vector3(-180, 0, 0),
+		new Vector3(0, -90, 0),
+		new Vector3(0, 90, 0)
+	};
 
 	private int RollNumber;
 	private bool IsRolling;
@@ -31,6 +42,7 @@ public class DiceScript : MonoBehaviour {
 
 	private void UpdateDice() {
 		float progress = (Time.time - rollStartTime) / RotationTime;
+		progress = Mathf.Min (progress, 1);
 		this.gameObject.transform.rotation = Quaternion.Euler (progress * rollRotation);
 	}
 
@@ -39,11 +51,9 @@ public class DiceScript : MonoBehaviour {
 	}
 
 	public void PrepareRoll() {
-		int x = Random.Range (5, 15);
-		int y = Random.Range (5, 15);
-		int z = Random.Range (5, 15);
-		
-		rollRotation = new Vector3 (90 * z, 90 * x, 90 * y); // For Quaternion.Euler(Vector3(z, x, y))
+		float roll = Mathf.Floor(Random.Range (1, 7));
+		RollNumber = (int) Mathf.Min (roll, 6);
+		rollRotation = RotationVector + Rolls[RollNumber-1];
 		print (rollRotation);
 		rollStartTime = Time.time;
 
@@ -52,32 +62,12 @@ public class DiceScript : MonoBehaviour {
 
 	private void EndRoll() {
 		IsRolling = false;
+		UpdateDice ();
 
 		print (this.gameObject.transform.forward);
-		RollNumber = CalculateRoll ();
-
 		print ("Rolled " + RollNumber);
-		
-		GameLogic.Instance.EndRound ();
+
 		GameLogic.Instance.StartRound (RollNumber);
-	}
-
-	private int CalculateRoll() {
-		Vector3 up = this.gameObject.transform.forward;
-
-		if (up.x > 0.5) {
-			return 1;
-		} else if (up.x < -0.5) {
-			return 2;
-		} else if (up.y > 0.5) {
-			return 3;
-		} else if (up.y < -0.5) {
-			return 4;
-		} else if (up.z > 0.5) {
-			return 5;
-		} else {
-			return 6;
-		}
 	}
 
 	private void OnMouseDown() {
@@ -88,7 +78,7 @@ public class DiceScript : MonoBehaviour {
 		if (!IsRolling) {
 			//RollNumber = (int)Mathf.Floor (Random.Range (1, 6)) + 1;
 			//print (RollNumber);
-
+			GameLogic.Instance.EndRound ();
 			PrepareRoll ();
 		}
 	}
