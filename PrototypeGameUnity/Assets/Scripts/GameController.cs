@@ -8,7 +8,7 @@ public class GameController : MonoBehaviour
     void Update ()
     {
         CheckInput();
-		GameLogic.Instance.ChechRoundFinished ();
+		GameLogic.Instance.CheckRoundFinished ();
 	}
 
     // Public methods

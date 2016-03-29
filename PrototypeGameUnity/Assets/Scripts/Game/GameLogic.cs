@@ -130,10 +130,12 @@ namespace Assets.Scripts.Game
 			return roundTime - GetRoundTime();
 		}
 
-		public void ChechRoundFinished() {
+		public bool CheckRoundFinished() {
 			if (GetTimeLeft() <= 0) {
 				BlockMovement();
+				return true;
 			}
+			return false;
 		}
 
 		private void BlockMovement() {

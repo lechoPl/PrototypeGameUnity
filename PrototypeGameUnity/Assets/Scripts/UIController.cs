@@ -4,9 +4,12 @@ using Assets.Scripts.Game;
 
 public class UIController : MonoBehaviour
 {
-    public GameObject GameMenuPanel;
 	public GameObject MoveUIPanel;
+	public GameObject PlayerStatsPanel;
 
+	public GameObject BottomPanel;
+	public GameObject Board;
+	
 	public Text TimeLabel;
 
     // MonoBehavior methods
@@ -19,6 +22,7 @@ public class UIController : MonoBehaviour
 	void Update ()
     {
         CheckInput();
+		ShowHidePlayerStats ();
         RefreshTimer();
     }
 
@@ -29,6 +33,14 @@ public class UIController : MonoBehaviour
 		if (GameLogic.Instance.GetTimeLeft() >= 0)
         {
 			TimeLabel.text = GetTimeLeftString ();
+		}
+	}
+
+	private void ShowHidePlayerStats()
+	{
+		if (PlayerStatsPanel != null)
+		{
+			PlayerStatsPanel.SetActive(GameLogic.Instance.CheckRoundFinished());
 		}
 	}
 	
@@ -48,13 +60,16 @@ public class UIController : MonoBehaviour
         }
     }
 
+	public void ShowBoard() {
+		Board.SetActive (!Board.activeSelf);
+	}
+
+	public void ShowBoard(bool show) {
+		Board.SetActive (show);
+	}
+
     private void SwitchUI()
     {
-        if (GameMenuPanel != null)
-        {
-            GameMenuPanel.SetActive(!GameMenuPanel.activeSelf);
-        }
-
         if (MoveUIPanel != null)
         {
             //MoveUIPanel.SetActive(!GameMenuPanel.activeSelf);
