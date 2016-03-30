@@ -4,6 +4,8 @@ namespace Assets.Scripts.Common
 {
     public static class Utilities
     {
+        public static readonly float eps = 0.00001f;
+
         private static System.Random _rand;
         public static System.Random rand
         {
