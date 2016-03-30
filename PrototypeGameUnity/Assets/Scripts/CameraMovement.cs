@@ -68,7 +68,15 @@ public class CameraMovement : MonoBehaviour
         }
         else
         {
-            targetSiez = originalSize * 12;
+            var maxBoardSize = GameLogic.Instance.BoardSize.MaxSize;
+            if(maxBoardSize.HasValue)
+            {
+                targetSiez = maxBoardSize.Value / 2;
+            }
+            else
+            {
+                targetSiez = originalSize;
+            }
         }
     }
 }

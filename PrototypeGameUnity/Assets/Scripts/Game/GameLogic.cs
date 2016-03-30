@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Game.Enums;
+using Assets.Scripts.Game.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,6 +17,8 @@ namespace Assets.Scripts.Game
         private float roundTime = 0;
 
         public int CurrentPlayer { get; private set; }
+
+        public BoardSize BoardSize { get; private set; }
 
         public bool MovementBlocked { get; private set; }
 
@@ -59,6 +62,7 @@ namespace Assets.Scripts.Game
             {
                 field.SetFieldName(string.Format("Field {0}", Fields.Count));
                 Fields.Add(field);
+                BoardSize.Update(field);
             }
             else
             {
@@ -79,6 +83,7 @@ namespace Assets.Scripts.Game
             if (Fields.Contains(field))
             {
                 Fields.Remove(field);
+                //TODO: update board size
             }
         }
 
@@ -149,7 +154,6 @@ namespace Assets.Scripts.Game
 
         // Private methods
         //***********************************
-
         private void BlockMovement()
         {
 			MovementBlocked = true;
@@ -159,10 +163,10 @@ namespace Assets.Scripts.Game
         {
             Players = new List<PlayerController>();
             Fields = new List<Field>();
+            BoardSize = new BoardSize();
 
             CurrentGameState = GameState.Move;
         }
-
 
         #region singleton pattern 
         private static GameLogic _instance;

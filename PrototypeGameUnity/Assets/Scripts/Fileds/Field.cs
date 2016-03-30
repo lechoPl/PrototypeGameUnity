@@ -47,7 +47,6 @@ public class Field : MonoBehaviour
     {
         ClearBounds();
         Setup();
-        GameLogic.Instance.RegisterFiled(this);
 	}
 
     void OnDestroy()
