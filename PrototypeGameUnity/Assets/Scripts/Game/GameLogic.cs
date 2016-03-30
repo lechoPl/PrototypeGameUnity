@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Scripts.Game.Enums;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -7,8 +8,16 @@ namespace Assets.Scripts.Game
     public class GameLogic
     {
 		private static int DiceTimeMultiplier = 5;
+        public GameState CurrentGameState { get; private set; }
         private IList<PlayerController> Players { get; set; }
         private IList<Field> Fields { get; set; }
+
+        private float roundStart = 0;
+        private float roundTime = 0;
+
+        public int CurrentPlayer { get; private set; }
+
+        public bool MovementBlocked { get; private set; }
 
         // Public methods
         //***********************************
@@ -17,13 +26,6 @@ namespace Assets.Scripts.Game
             p.ResetVelocity();
             p.transform.position = Fields[FieldId].SartPointPosition;
         }
-
-        public int CurrentPlayer { get; private set; }
-
-		private float roundStart = 0;
-		private float roundTime = 0;
-
-		public bool MovementBlocked { get; private set; }
 
         public void RegisterPlayer(PlayerController player)
         {
@@ -122,30 +124,43 @@ namespace Assets.Scripts.Game
                 right > p.transform.position.x).ToList();
         }
 
-		public float GetRoundTime() {
+		public float GetRoundTime()
+        {
 			return Time.time - roundStart;
 		}
 
-		public float GetTimeLeft() {
+		public float GetTimeLeft()
+        {
 			return roundTime - GetRoundTime();
 		}
 
-		public void ChechRoundFinished() {
-			if (GetTimeLeft() <= 0) {
+		public void ChechRoundFinished()
+        {
+			if (GetTimeLeft() <= 0)
+            {
 				BlockMovement();
 			}
 		}
 
-		private void BlockMovement() {
-			MovementBlocked = true;
-		}
+        public void SetGameState(GameState state)
+        {
+            CurrentGameState = state;
+        }
 
         // Private methods
         //***********************************
+
+        private void BlockMovement()
+        {
+			MovementBlocked = true;
+		}
+        
         private GameLogic()
         {
             Players = new List<PlayerController>();
             Fields = new List<Field>();
+
+            CurrentGameState = GameState.Move;
         }
 
 

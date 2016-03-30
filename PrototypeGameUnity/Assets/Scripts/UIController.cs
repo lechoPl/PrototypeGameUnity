@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.Game;
+using Assets.Scripts.Game.Enums;
 
 public class UIController : MonoBehaviour
 {
@@ -50,14 +51,25 @@ public class UIController : MonoBehaviour
 
     private void SwitchUI()
     {
+        if(GameLogic.Instance.CurrentGameState == GameState.Menu)
+        {
+            GameLogic.Instance.SetGameState(GameState.Move);
+        }
+        else
+        {
+            GameLogic.Instance.SetGameState(GameState.Menu);
+        }
+
         if (GameMenuPanel != null)
         {
-            GameMenuPanel.SetActive(!GameMenuPanel.activeSelf);
+            GameMenuPanel.SetActive(GameLogic.Instance.CurrentGameState == GameState.Menu);
         }
 
         if (MoveUIPanel != null)
         {
-            MoveUIPanel.SetActive(!GameMenuPanel.activeSelf);
+            MoveUIPanel.SetActive(GameLogic.Instance.CurrentGameState == GameState.Move);
         }
+
+
     }
 }
