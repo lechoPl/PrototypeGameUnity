@@ -37,6 +37,8 @@ namespace Assets.Scripts.Game
                 player.SetPlayerName(string.Format("Player {0}", Players.Count));
                 Players.Add(player);
 
+                player.SetPlayerId(Players.Count); // count form 1
+
                 if (Fields.Count > 0)
                 {
                     PlayerToNextField(player, 0);

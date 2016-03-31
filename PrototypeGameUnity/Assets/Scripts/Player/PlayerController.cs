@@ -2,10 +2,13 @@
 using UnityEngine;
 using System.Linq;
 using Assets.Scripts.Common;
+using Assets.Scripts.Game.Enums;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
+    public int Id { get; private set; }
+
     [Header("Physics")]
     public float Speed = 5f;
     public float jumpForce = 700f;
@@ -24,6 +27,8 @@ public class PlayerController : MonoBehaviour
     private float _lastMove;
     private Vector2 _lastPosition;
 
+    private PlayerMark playerMark;
+
     // MonoBehavior methods
     //***********************************
     void Start()
@@ -34,6 +39,10 @@ public class PlayerController : MonoBehaviour
 
         _lastMove = Input.GetAxis("Horizontal");
         _lastPosition = transform.position;
+
+        playerMark = GetComponentInChildren<PlayerMark>();
+
+        SetupPlayerMark();
     }
 
     void OnDestroy()
@@ -57,8 +66,6 @@ public class PlayerController : MonoBehaviour
 
         float move = Input.GetAxis("Horizontal");
 
-        Debug.Log(string.Format("{0} - last: {1}", move, _lastMove));
-
         if (_lastMove != move || Mathf.Abs(_lastPosition.x - transform.position.x) > Utilities.eps)
         {
             _rigidbody.velocity = new Vector2(move * Speed, _rigidbody.velocity.y);
@@ -70,6 +77,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        playerMark.CheckActive();
+
         if (!CanPlayerMove())
         {
             return;
@@ -79,7 +88,6 @@ public class PlayerController : MonoBehaviour
         {
             Jump();
         }
-
     }
 
     // Public methods
@@ -99,6 +107,11 @@ public class PlayerController : MonoBehaviour
         this.name = name;
     }
 
+    public void SetPlayerId(int id)
+    {
+        Id = id;
+    }
+
     // Private methods
     //***********************************
     private void Jump()
@@ -116,10 +129,22 @@ public class PlayerController : MonoBehaviour
             return false;
         }
 
+        // Commented for test
         //if (GameLogic.Instance.MovementBlocked) {
         //	return false;
         //}
 
         return true;
+    }
+
+    private void SetupPlayerMark()
+    {
+        if (playerMark != null)
+        {
+            playerMark.SetPlayerText(Id);
+
+            var render = GetComponent<Renderer>();
+            playerMark.SetColor(render.material);
+        }
     }
 }
