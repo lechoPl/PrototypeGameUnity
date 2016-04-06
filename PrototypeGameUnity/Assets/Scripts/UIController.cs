@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.Game;
+using Assets.Scripts.Game.Enums;
 
 public class UIController : MonoBehaviour
 {
@@ -42,6 +43,10 @@ public class UIController : MonoBehaviour
 		{
 			PlayerStatsPanel.SetActive(GameLogic.Instance.CheckRoundFinished());
 		}
+		if (BottomPanel != null) 
+		{
+			BottomPanel.SetActive(GameLogic.Instance.CheckRoundFinished());
+		}
 	}
 	
 	private string GetTimeLeftString()
@@ -58,6 +63,11 @@ public class UIController : MonoBehaviour
         {
             SwitchUI();
         }
+		if (Input.GetKeyDown(KeyCode.Return)) {
+			Player player = GameLogic.Instance.GetCurrentPlayer().Player;
+			Field field = GameLogic.Instance.GetCurrentPlayer().Player.CurrentField;
+			GameLogic.Instance.BuyField(player, field);
+		}
     }
 
 	public void ShowBoard() {
@@ -73,6 +83,9 @@ public class UIController : MonoBehaviour
         if (MoveUIPanel != null)
         {
             //MoveUIPanel.SetActive(!GameMenuPanel.activeSelf);
+
         }
+
+
     }
 }

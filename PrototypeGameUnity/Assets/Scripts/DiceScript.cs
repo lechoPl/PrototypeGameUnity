@@ -7,6 +7,7 @@ using Assets.Scripts.Game;
 public class DiceScript : MonoBehaviour {
 	private static Vector2 RotationOffset = new Vector2 (10, -10);
 	private static Vector3 RotationVector = new Vector3 (720 + RotationOffset.x, 720 + RotationOffset.y, 0);
+
 	private const float RotationTime = 2;
 	
 	private float rollStartTime = -RotationTime;
@@ -43,6 +44,7 @@ public class DiceScript : MonoBehaviour {
 	private void UpdateDice() {
 		float progress = (Time.time - rollStartTime) / RotationTime;
 		progress = Mathf.Min (progress, 1);
+
 		this.gameObject.transform.rotation = Quaternion.Euler (progress * rollRotation);
 	}
 
@@ -51,9 +53,11 @@ public class DiceScript : MonoBehaviour {
 	}
 
 	public void PrepareRoll() {
+
 		float roll = Mathf.Floor(Random.Range (1, 7));
 		RollNumber = (int) Mathf.Min (roll, 6);
 		rollRotation = RotationVector + Rolls[RollNumber-1];
+
 		print (rollRotation);
 		rollStartTime = Time.time;
 
@@ -62,6 +66,7 @@ public class DiceScript : MonoBehaviour {
 
 	private void EndRoll() {
 		IsRolling = false;
+
 		UpdateDice ();
 
 		print (this.gameObject.transform.forward);
@@ -76,9 +81,8 @@ public class DiceScript : MonoBehaviour {
 
 	public void RollDice() {
 		if (!IsRolling) {
-			//RollNumber = (int)Mathf.Floor (Random.Range (1, 6)) + 1;
-			//print (RollNumber);
 			GameLogic.Instance.EndRound ();
+
 			PrepareRoll ();
 		}
 	}

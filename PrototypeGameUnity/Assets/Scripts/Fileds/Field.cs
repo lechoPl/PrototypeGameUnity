@@ -2,9 +2,19 @@
 using Assets.Scripts.Game;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Field : MonoBehaviour
 {
+	public int _id { get; set; }
+	public Player _owner;
+	public void SetOwner(Player player) {
+		_owner = player;
+		Text.text = _owner._playerName + " owns this field.";
+	}
+	public int _price { get; private set; }
+
+	public TextMesh Text;
     public int Width;
     public void SetWidth(int val)
     {
@@ -17,7 +27,7 @@ public class Field : MonoBehaviour
         Height = val;
         SetupBoundsHeight();
     }
-    public Vector3 SartPointPosition
+    public Vector3 StartPointPosition
     {
         get
         {
@@ -47,7 +57,9 @@ public class Field : MonoBehaviour
     {
         ClearBounds();
         Setup();
-        GameLogic.Instance.RegisterFiled(this);
+		_id = GameLogic.Instance.GetNewFieldId();
+		_price = 100;
+		this.name = string.Format("Field {0}", _id);
 	}
 
     void OnDestroy()
