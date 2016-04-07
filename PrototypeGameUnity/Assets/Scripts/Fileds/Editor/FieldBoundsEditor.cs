@@ -1,8 +1,8 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(Field))]
-public class FieldEditor : Editor
+[CustomEditor(typeof(FieldBounds))]
+public class FieldBoundsEditor : Editor
 {
     public override void OnInspectorGUI()
     {
@@ -10,7 +10,7 @@ public class FieldEditor : Editor
 
         if (GUI.changed)
         {
-            var fieldsGenerator = target as Field;
+            var fieldsGenerator = target as FieldBounds;
 
             fieldsGenerator.ClearBounds();
             fieldsGenerator.SetupBoundsWidth();

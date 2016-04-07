@@ -7,10 +7,10 @@ public class EndPoint : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D coll)
     {
-        var playerControlerGameObject = coll.gameObject.GetComponent<PlayerController>();
-        if(playerControlerGameObject != null)
+        var playerGameObject = coll.gameObject.GetComponent<Player>();
+        if(playerGameObject != null)
         {
-            GameLogic.Instance.PlayerToNextField(playerControlerGameObject, NextFieldID);
+            GameLogic.Instance.PlayerToNextField(playerGameObject, NextFieldID);
         }
     }
 }

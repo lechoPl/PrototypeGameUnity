@@ -30,7 +30,7 @@ public class CameraMovement : MonoBehaviour
     {
         var currentGameState = GameLogic.Instance.CurrentGameState;
 
-        if(currentGameState != _lastGameSate)
+        if (currentGameState != _lastGameSate)
         {
             SwitchCameraMode();
             _lastGameSate = currentGameState;
@@ -62,14 +62,14 @@ public class CameraMovement : MonoBehaviour
     //***********************************
     private void SwitchCameraMode()
     {
-        if(GameLogic.Instance.CurrentGameState == GameState.Move )
+        if (GameLogic.Instance.CurrentGameState == GameState.Move)
         {
             targetSiez = originalSize;
         }
         else
         {
             var maxBoardSize = GameLogic.Instance.BoardSize.MaxSize;
-            if(maxBoardSize.HasValue)
+            if (maxBoardSize.HasValue)
             {
                 targetSiez = maxBoardSize.Value / 2;
             }

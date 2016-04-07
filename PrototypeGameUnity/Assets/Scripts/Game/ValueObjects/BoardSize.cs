@@ -60,10 +60,10 @@ namespace Assets.Scripts.Game.ValueObjects
 
         public void Update(Field field)
         {
-            float minX = field.transform.position.x - field.Width / 2;
-            float maxX = field.transform.position.x + field.Width / 2;
-            float minY = field.transform.position.y - field.Height / 2;
-            float maxY = field.transform.position.y + field.Height / 2;
+            float minX = field.transform.position.x - field.Bounds.Width / 2;
+            float maxX = field.transform.position.x + field.Bounds.Width / 2;
+            float minY = field.transform.position.y - field.Bounds.Height / 2;
+            float maxY = field.transform.position.y + field.Bounds.Height / 2;
 
             MinX = !MinX.HasValue || MinX.Value > minX ? minX : MinX;
             MaxX = !MaxX.HasValue || MaxX.Value < maxX ? maxX : MaxX;

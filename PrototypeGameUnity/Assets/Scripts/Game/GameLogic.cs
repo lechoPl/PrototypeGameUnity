@@ -8,9 +8,9 @@ namespace Assets.Scripts.Game
 {
     public class GameLogic
     {
-		private static int DiceTimeMultiplier = 5;
+        private static int DiceTimeMultiplier = 5;
         public GameState CurrentGameState { get; private set; }
-        private IList<PlayerController> Players { get; set; }
+        private IList<Player> Players { get; set; }
         private IList<Field> Fields { get; set; }
 
         private float roundStart = 0;
@@ -24,19 +24,22 @@ namespace Assets.Scripts.Game
 
         // Public methods
         //***********************************
-		#region players managing
-        public void PlayerToNextField(PlayerController p, int FieldId)
+        #region players managing
+
+        public void PlayerToNextField(Player p, int FieldId)
         {
-            p.ResetVelocity();
-			p.Player.CurrentField = Fields[FieldId];
-			p.transform.position = Fields[FieldId].StartPointPosition;
+            p.Controller.ResetVelocity();
+            p.CurrentField = Fields[FieldId];
+            p.transform.position = Fields[FieldId].StartPointPosition;
         }
 
-        public void RegisterPlayer(PlayerController player)
+        public void RegisterPlayer(Player player)
         {
             if (!Players.Contains(player))
             {
                 Players.Add(player);
+                player.SetPlayerName(string.Format("Player {0}", Players.Count));
+                player.SetId(Players.Count);
 
                 if (Fields.Count > 0)
                 {
@@ -49,7 +52,7 @@ namespace Assets.Scripts.Game
             }
         }
 
-        public void RemovePlayer(PlayerController player)
+        public void RemovePlayer(Player player)
         {
             if (Players.Contains(player))
             {
@@ -57,28 +60,29 @@ namespace Assets.Scripts.Game
             }
         }
 
-		public PlayerController GetCurrentPlayer()
-		{
-			if(CurrentPlayer < 0 || CurrentPlayer >= Players.Count)
-			{
-				return null;
-			}
-			
-			return Players[CurrentPlayer];
-		}
-		
-		public int GetNewPlayerId()
-		{
-			return Players.Count;
-		}
-		#endregion
+        public Player GetCurrentPlayer()
+        {
+            if (CurrentPlayer < 0 || CurrentPlayer >= Players.Count)
+            {
+                return null;
+            }
 
-		#region fields managing
+            return Players[CurrentPlayer];
+        }
+
+        #endregion
+
+        #region fields managing
+        //***********************************
+
         public void RegisterField(Field field)
         {
             if (!Fields.Contains(field))
             {
                 Fields.Add(field);
+                field.SetFieldName(string.Format("Field {0}", Fields.Count));
+                field.SetFieldId(Fields.Count);
+
                 BoardSize.Update(field);
             }
             else
@@ -86,9 +90,9 @@ namespace Assets.Scripts.Game
                 Debug.Log(string.Format("RegisterFiled: {0} is already registered", field.name));
             }
 
-            if(Fields.Count == 1)
+            if (Fields.Count == 1)
             {
-                foreach(var player in Players)
+                foreach (var player in Players)
                 {
                     PlayerToNextField(player, 0);
                 }
@@ -104,99 +108,104 @@ namespace Assets.Scripts.Game
             }
         }
 
-		public IList<PlayerController> GetPlayersOnField(int fieldNumber)
-		{
-			if(fieldNumber < 0 || fieldNumber >= Fields.Count)
-			{
-				return null;
-			}
-			
-			var field = Fields[fieldNumber];
-			
-			var top = field.transform.position.y + field.Height / 2f;
-			var down = field.transform.position.y - field.Height / 2f;
-			var left = field.transform.position.x - field.Width / 2f;
-			var right = field.transform.position.x + field.Width / 2f;
-			
-			return Players.Where(p => 
-			                     top > p.transform.position.y &&
-			                     down < p.transform.position.y &&
-			                     left < p.transform.position.x &&
-			                     right > p.transform.position.x).ToList();
-		}
-		
-		public int GetNewFieldId()
-		{
-			return Fields.Count;
-		}
+        public IList<Player> GetPlayersOnField(int fieldNumber)
+        {
+            if (fieldNumber < 0 || fieldNumber >= Fields.Count)
+            {
+                return null;
+            }
 
-		#region monopoly part
-		public void BuyField(Player player, Field field) {
-			if(player.Money >= field._price) {
-				if(field._owner != null) {
-					field._owner.Money += field._price;
-				}
-				field.SetOwner(player);
-				player.Money -= field._price;
-			}
-		}
-		#endregion
+            var field = Fields[fieldNumber];
 
-		#endregion
+            var top = field.transform.position.y + field.Bounds.Height / 2f;
+            var down = field.transform.position.y - field.Bounds.Height / 2f;
+            var left = field.transform.position.x - field.Bounds.Width / 2f;
+            var right = field.transform.position.x + field.Bounds.Width / 2f;
 
-		#region round managing
-		public void StartRound(int DiceValue) {
-			roundStart = Time.time;
-			roundTime = DiceTimeMultiplier * DiceValue;
-			MovementBlocked = false;
-			SetGameState (GameState.Move);
-		}
+            return Players.Where(p =>
+                                 top > p.transform.position.y &&
+                                 down < p.transform.position.y &&
+                                 left < p.transform.position.x &&
+                                 right > p.transform.position.x).ToList();
+        }
+
+        #endregion
+
+
+        #region monopoly part
+        public void BuyField(Player player, Field field)
+        {
+            if (player.Money >= field.Price)
+            {
+                if (field.Ovner != null)
+                {
+                    field.Ovner.Money += field.Price;
+                }
+                field.SetOwner(player);
+                player.Money -= field.Price;
+            }
+        }
+        #endregion
+
+
+        #region round managing
+        //***********************************
+
+        public void StartRound(int DiceValue)
+        {
+            roundStart = Time.time;
+            roundTime = DiceTimeMultiplier * DiceValue;
+            MovementBlocked = false;
+            SetGameState(GameState.Move);
+        }
 
         public void EndRound()
         {
             CurrentPlayer = (CurrentPlayer + 1) % Players.Count;
-        }        
+        }
 
-		public float GetRoundTime()
+        public float GetRoundTime()
         {
-			return Time.time - roundStart;
-		}
+            return Time.time - roundStart;
+        }
 
-		public float GetTimeLeft()
+        public float GetTimeLeft()
         {
-			return roundTime - GetRoundTime();
-		}
-		
-		public bool CheckRoundFinished()
+            return roundTime - GetRoundTime();
+        }
+
+        public bool CheckRoundFinished()
         {
-			if (GetTimeLeft() <= 0)
+            if (GetTimeLeft() <= 0)
             {
-				SetGameState(GameState.Menu);
-				BlockMovement();
-				return true;
-			}
-			return false;
-		}
-		#endregion
+                SetGameState(GameState.Menu);
+                BlockMovement();
+                return true;
+            }
+            return false;
+        }
+        #endregion
 
-		#region game state managing
+
+        #region game state managing
+        //***********************************
+
         public void SetGameState(GameState state)
         {
             CurrentGameState = state;
         }
 
         // Private methods
-        //***********************************
         private void BlockMovement()
         {
-			MovementBlocked = true;
-		}
-		#endregion
-	
-        
+            MovementBlocked = true;
+        }
+        #endregion
+
+
         private GameLogic()
         {
-            Players = new List<PlayerController>();
+            Players = new List<Player>();
             Fields = new List<Field>();
             BoardSize = new BoardSize();
 
@@ -210,7 +219,7 @@ namespace Assets.Scripts.Game
         {
             get
             {
-                if(_instance == null)
+                if (_instance == null)
                 {
                     _instance = new GameLogic();
                 }
@@ -220,4 +229,3 @@ namespace Assets.Scripts.Game
         #endregion
     }
 }
-    

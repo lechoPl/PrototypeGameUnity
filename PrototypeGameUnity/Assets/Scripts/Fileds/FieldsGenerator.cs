@@ -37,8 +37,8 @@ public class FieldsGenerator : MonoBehaviour
             return;
         }
 
-        var fieldMaxWidth = PrefabLists.Max(f => f.Prefab.Width);
-        var fieldMaxHeight = PrefabLists.Max(f => f.Prefab.Height);
+        var fieldMaxWidth = PrefabLists.Max(f => f.Prefab.Bounds.Width);
+        var fieldMaxHeight = PrefabLists.Max(f => f.Prefab.Bounds.Height);
         RadiusX = fieldMaxWidth * (NumberOfFields - 1) / 2f;
         RadiusY = fieldMaxHeight * (NumberOfFields - 1) / 2f;
 

@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Game;
+using Assets.Scripts.Game.Enums;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -26,6 +27,24 @@ public class GameController : MonoBehaviour
     //***********************************
     private void CheckInput()
     {
-        //nothing
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            if(GameLogic.Instance.CurrentGameState == GameState.Move)
+            {
+                GameLogic.Instance.SetGameState(GameState.Menu);
+            }
+            else
+            {
+                GameLogic.Instance.SetGameState(GameState.Move);
+
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            Player player = GameLogic.Instance.GetCurrentPlayer();
+            Field field = GameLogic.Instance.GetCurrentPlayer().CurrentField;
+            GameLogic.Instance.BuyField(player, field);
+        }
     }
 }

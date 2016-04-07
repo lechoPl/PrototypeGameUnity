@@ -1,37 +1,36 @@
 ﻿using Assets.Scripts.Common;
 using Assets.Scripts.Game;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
+[RequireComponent(typeof(FieldBounds))]
 public class Field : MonoBehaviour
 {
-	public int _id { get; set; }
-	public Player _owner;
-	public void SetOwner(Player player) {
-		_owner = player;
-		Text.text = _owner._playerName + " owns this field.";
-	}
-	public int _price { get; private set; }
+    public int Id { get; private set; }
+    public Player Ovner { get; private set; }
+    public int Price = 100;
+    public TextMesh Text;
 
-	public TextMesh Text;
-    public int Width;
-    public void SetWidth(int val)
+    private FieldBounds _bounds;
+    public FieldBounds Bounds
     {
-        Width = val;
-        SetupBoundsWidth();
+        get
+        {
+            if (_bounds == null)
+            {
+                _bounds = GetComponent<FieldBounds>();
+            }
+
+            return _bounds;
+        }
     }
-    public int Height;
-    public void SetHeight(int val)
-    {
-        Height = val;
-        SetupBoundsHeight();
-    }
+    private GameObject _startPoint;
+    private EndPoint _endPoint;
+
     public Vector3 StartPointPosition
     {
         get
         {
-            if(_startPoint == null)
+            if (_startPoint == null)
             {
                 return Vector3.zero;
             }
@@ -42,62 +41,45 @@ public class Field : MonoBehaviour
         }
     }
 
-    private GameObject _startPoint;
-    private EndPoint _endPoint;
 
-    private GameObject Bounds;
-    private GameObject TopBound;
-    private GameObject DownBound;
-    private GameObject LeftBound;
-    private GameObject RightBound;
 
-    // MonoBehaviour methods
+    #region MonoBehaviour methods
     //***********************************
-    void Awake ()
+
+    void Awake()
     {
-        ClearBounds();
+
         Setup();
-		_id = GameLogic.Instance.GetNewFieldId();
-		_price = 100;
-		this.name = string.Format("Field {0}", _id);
-	}
+    }
 
     void OnDestroy()
     {
         GameLogic.Instance.RemoveField(this);
     }
 
-    // Public methods
+    #endregion
+
+    #region Public methods
     //***********************************
+    public void SetOwner(Player player)
+    {
+        Ovner = player;
+        Text.text = Ovner.name + " owns this field.";
+    }
+
     public void SetFieldName(string name)
     {
         this.name = name;
     }
 
-    public void AddStartPoint(GameObject sp, Vector3 pos)
+    public void SetFieldId(int id)
     {
-        _startPoint = GameObject.Instantiate(sp);
-        _startPoint.transform.position = pos;
-        _startPoint.transform.parent = transform;
-    }
-
-    public void AddEndPoint(EndPoint ep, Vector3 pos, int nextFieldId)
-    {
-        if(ep == null)
-        {
-            Debug.Log("Wrong EndPoint");
-            return;
-        }
-
-        _endPoint = GameObject.Instantiate(ep);
-        _endPoint.transform.position = pos;
-        _endPoint.transform.parent = transform;
-        _endPoint.NextFieldID = nextFieldId;
+        Id = id;
     }
 
     public void SetEndPointNextFieldId(int nexFieldId)
     {
-        if(_endPoint == null)
+        if (_endPoint == null)
         {
             return;
         }
@@ -109,52 +91,12 @@ public class Field : MonoBehaviour
     {
         SetupStartPoint();
         SetupEndPoint();
-
-        SetupBoundsWidth();
-        SetupBoundsHeight();
     }
 
-    public void SetupBoundsWidth()
-    {
-        CheckBounds();
+    #endregion
 
-        TopBound.transform.localScale += (-TopBound.transform.localScale) + new Vector3(Width, 1f, 1f);
-        DownBound.transform.localScale += (-DownBound.transform.localScale) + new Vector3(Width, 1f, 1f);
-        LeftBound.transform.position += new Vector3(-Width / 2f, 0f, 0f);
-        RightBound.transform.position += new Vector3(Width / 2f, 0f, 0f);
-    }
 
-    public void SetupBoundsHeight()
-    {
-        CheckBounds();
-
-        TopBound.transform.position += new Vector3(0f, Height / 2f, 0f);
-        DownBound.transform.position += new Vector3(0f, -Height / 2f, 0f);
-        LeftBound.transform.localScale += (-LeftBound.transform.localScale) + new Vector3(1f, Height, 1f);
-        RightBound.transform.localScale += (-RightBound.transform.localScale) + new Vector3(1f, Height, 1f);
-    }
-
-    public void ClearBounds()
-    {
-        if(Bounds == null)
-        {
-            return;
-        }
-
-        var childsToDestroy = new List<GameObject>();
-
-        for (int i = 0; i < Bounds.transform.childCount; ++i)
-        {
-            childsToDestroy.Add(Bounds.transform.GetChild(i).gameObject);
-        }
-
-        foreach (var child in childsToDestroy)
-        {
-            DestroyImmediate(child);
-        }
-    }
-
-    // Private methods
+    #region Private methods
     //***********************************
     private void SetupStartPoint()
     {
@@ -166,54 +108,5 @@ public class Field : MonoBehaviour
         _endPoint = Utilities.FindComponentInChildWithTag<EndPoint>(this.gameObject, "EndPoint");
     }
 
-    private void CheckBounds()
-    {
-        if(Bounds == null)
-        {
-            Bounds = CreateEmpy("Bounds");
-        }
-
-        if (TopBound == null)
-        {
-            TopBound = CreateBound("Bound Top");
-        }
-
-        if (DownBound == null)
-        {
-            DownBound = CreateBound("Bound Down");
-        }
-
-        if (LeftBound == null)
-        {
-            LeftBound = CreateBound("Bound Left");
-        }
-        
-        if (RightBound == null)
-        {
-            RightBound = CreateBound("Bound Right");
-        }
-    }
-
-    private GameObject CreateEmpy(string name)
-    {
-        var empty = new GameObject(name);
-
-        empty.transform.position = transform.position;
-        empty.transform.parent = transform;
-
-        return empty;
-    }
-
-    private GameObject CreateBound(string name)
-    {
-        var bound = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-        DestroyImmediate(bound.GetComponent<BoxCollider>());
-        bound.AddComponent(typeof(BoxCollider2D));
-        bound.name = string.Format(name);
-        bound.transform.position = transform.position;
-        bound.transform.parent = Bounds.transform;
-
-        return bound;
-    }
+    #endregion
 }

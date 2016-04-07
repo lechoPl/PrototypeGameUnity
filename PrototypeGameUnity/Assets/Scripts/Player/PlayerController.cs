@@ -2,17 +2,12 @@
 using UnityEngine;
 using System.Linq;
 using Assets.Scripts.Common;
-using Assets.Scripts.Game.Enums;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    public int Id { get; private set; }
-
-	public Player Player = new Player();
-
     [Header("Physics")]
-    public float Speed = 5f;
+    public float Speed = 10f;
     public float jumpForce = 700f;
     public int maxJumpCount = 2;
 
@@ -29,33 +24,23 @@ public class PlayerController : MonoBehaviour
     private float _lastMove;
     private Vector2 _lastPosition;
 
-    private PlayerMark playerMark;
 
-    // MonoBehavior methods
+    #region MonoBehavior methods
     //***********************************
     void Start()
     {
-        GameLogic.Instance.RegisterPlayer(this);
         _rigidbody = GetComponent<Rigidbody2D>();
         _collider = GetComponent<Collider2D>();
 
         _lastMove = Input.GetAxis("Horizontal");
         _lastPosition = transform.position;
-
-        playerMark = GetComponentInChildren<PlayerMark>();
-
-        SetupPlayerMark();
-    }
-
-    void OnDestroy()
-    {
-        GameLogic.Instance.RemovePlayer(this);
     }
 
     void FixedUpdate()
     {
         if (!CanPlayerMove())
         {
+            Debug.Log("lipa :(");
             return;
         }
 
@@ -79,25 +64,25 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        playerMark.CheckActive();
-
         if (!CanPlayerMove())
         {
             return;
         }
 
-        if ((isGrounded || jumpCount < maxJumpCount-1) && Input.GetButtonDown("Jump"))
+        if ((isGrounded || jumpCount < maxJumpCount - 1) && Input.GetButtonDown("Jump"))
         {
             Jump();
         }
-		
     }
 
-    // Public methods
+    #endregion
+
+
+    #region Public methods
     //***********************************
     public void ResetVelocity()
     {
-        if(_rigidbody == null)
+        if (_rigidbody == null)
         {
             return;
         }
@@ -105,13 +90,10 @@ public class PlayerController : MonoBehaviour
         _rigidbody.velocity = Vector2.zero;
     }
 
-	public void SetName(string name)
-	{
-		Player._playerName = name;
-		this.name = name;
-	}
+    #endregion
 
-    // Private methods
+
+    #region Private methods
     //***********************************
     private void Jump()
     {
@@ -123,7 +105,12 @@ public class PlayerController : MonoBehaviour
 
     private bool CanPlayerMove()
     {
-        if (GameLogic.Instance.GetCurrentPlayer() != this || GameLogic.Instance.CheckRoundFinished())
+        if (GameLogic.Instance.GetCurrentPlayer().Controller != this)
+        {
+            return false;
+        }
+
+        if (GameLogic.Instance.CheckRoundFinished())
         {
             return false;
         }
@@ -136,14 +123,5 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    private void SetupPlayerMark()
-    {
-        if (playerMark != null)
-        {
-            playerMark.SetPlayerText(Id);
-
-            var render = GetComponent<Renderer>();
-            playerMark.SetColor(render.material);
-        }
-    }
+    #endregion
 }
