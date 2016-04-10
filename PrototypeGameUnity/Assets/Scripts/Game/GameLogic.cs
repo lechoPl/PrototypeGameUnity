@@ -70,6 +70,11 @@ namespace Assets.Scripts.Game
             return Players[CurrentPlayer];
         }
 
+		public IList<Player> GetPlayers()
+		{
+			return Players;
+		}
+
         #endregion
 
         #region fields managing

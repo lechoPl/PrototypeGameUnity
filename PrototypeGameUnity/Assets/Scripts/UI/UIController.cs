@@ -19,6 +19,7 @@ public class UIController : MonoBehaviour
     {
         CheckInput();
         ShowHidePlayerStats();
+		RefreshPlayerStats();
         RefreshTimer();
     }
 
@@ -43,6 +44,20 @@ public class UIController : MonoBehaviour
             BottomPanel.SetActive(GameLogic.Instance.CurrentGameState == GameState.Menu);
         }
     }
+
+	private void RefreshPlayerStats()
+	{
+		print (transform.childCount);
+		for(int i=0; i<PlayerStatsPanel.transform.childCount; i++)
+		{
+			if(i < GameLogic.Instance.GetPlayers().Count)
+			{
+				PlayerStatistics playerStatistics = PlayerStatsPanel.transform.GetChild(i).gameObject.GetComponent(typeof(PlayerStatistics)) as PlayerStatistics;
+				playerStatistics.SetPlayer(GameLogic.Instance.GetPlayers()[i]);
+			}
+			PlayerStatsPanel.transform.GetChild(i).gameObject.SetActive(i < GameLogic.Instance.GetPlayers().Count);
+		}
+	}
 
     private string GetTimeLeftString()
     {
