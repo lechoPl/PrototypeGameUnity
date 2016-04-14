@@ -61,6 +61,8 @@ public class FieldsGeneratorEditor : Editor
 
             fieldsGenerator.ClearFields();
             fieldsGenerator.CreateFields();
+
+            SceneView.RepaintAll();
         }
     }
 

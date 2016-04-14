@@ -16,13 +16,14 @@ public class Terrain2D : MonoBehaviour
                             new Vector2(1, -1)
                         };
 
+    [HideInInspector]
+    public Terrain2DEditorSettings EditorSettings = new Terrain2DEditorSettings();
+
     public Material material;
 
     public bool CreateCollider;
 
-    [HideInInspector]
-    public Terrain2DEditorSettings EditorSettings = new Terrain2DEditorSettings();
-
+    [SerializeField]
     private MeshFilter meshFilter
     {
         get
@@ -64,6 +65,7 @@ public class Terrain2D : MonoBehaviour
 
     void Awake()
     {
+        Debug.Log("test");
         SetupDataMesh();
     }
 
@@ -176,20 +178,14 @@ public class Terrain2D : MonoBehaviour
 
     private IList<Vector2> GetUVMapping(IList<Vector3> verticies)
     {
-        float textureHeight = material.mainTexture.height;
-        float textureWidth = material.mainTexture.width;
-
         var uvs = new List<Vector2>();
         for (int i = 0; i < verticies.Count; i++)
         {
             var vertex = verticies[i];
 
             //Our standard uv mapping is just our point in space divided by the width and the height of our texture (assuming an x/y plane)
-            float xMapping = 0f;
-            float yMapping = 0f;
-
-            xMapping = vertex.x;
-            yMapping = vertex.y;
+            float xMapping = vertex.x;
+            float yMapping = vertex.y;
 
             //Finally set the actual uv mapping
             var uv = new Vector2(xMapping, yMapping);
