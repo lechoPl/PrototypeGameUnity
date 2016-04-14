@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 using Assets.Scripts.Game;
 
 public class DiceScript : MonoBehaviour
 {
-    private static Vector2 RotationOffset = new Vector2(10, -10);
-    private static Vector3 RotationVector = new Vector3(720 + RotationOffset.x, 720 + RotationOffset.y, 0);
+    private static Vector3 RotationVector = new Vector3(720, 720, 0);
 
     private const float RotationTime = 2;
 
@@ -13,12 +13,12 @@ public class DiceScript : MonoBehaviour
     private Vector3 rollRotation;
 
     private Vector3[] Rolls = new Vector3[]{
-        new Vector3(270, 0, 0),
-        new Vector3(0, 0, 0),
-        new Vector3(90, 0, 0),
-        new Vector3(-180, 0, 0),
-        new Vector3(0, -90, 0),
-        new Vector3(0, 90, 0)
+        new Vector3(280, -10, 0),
+        new Vector3(10, -10, 0),
+        new Vector3(100, -10, 0),
+        new Vector3(-190, -10, 0),
+        new Vector3(0, -100, -10),
+        new Vector3(0, 80, 10)
     };
 
     private int RollNumber;
@@ -51,7 +51,7 @@ public class DiceScript : MonoBehaviour
         float progress = (Time.time - rollStartTime) / RotationTime;
         progress = Mathf.Min(progress, 1);
 
-        this.gameObject.transform.rotation = Quaternion.Euler(progress * rollRotation);
+        this.gameObject.transform.eulerAngles = progress * rollRotation;
     }
 
     public int GetRollNumber()
@@ -81,8 +81,14 @@ public class DiceScript : MonoBehaviour
         print(this.gameObject.transform.forward);
         print("Rolled " + RollNumber);
 
-        GameLogic.Instance.StartRound(RollNumber);
+		StartCoroutine(DelayStart(2));
     }
+
+	private IEnumerator DelayStart(float seconds)
+	{
+		yield return new WaitForSeconds(seconds);
+		GameLogic.Instance.StartRound(RollNumber);
+	}
 
     private void OnMouseDown()
     {
