@@ -28,6 +28,6 @@ public class PlayerMark : MonoBehaviour
 
     public void CheckActive()
     {
-        gameObject.SetActive(GameLogic.Instance.CurrentGameState == GameState.Menu);
+        gameObject.SetActive(GameLogic.Instance.CurrentRound.GameState == GameState.Menu);
     }
 }

@@ -28,14 +28,14 @@ public class CameraController : MonoBehaviour
         originalSize = Camera.main.orthographicSize;
         targetSiez = originalSize;
 
-        _lastGameSate = GameLogic.Instance.CurrentGameState;
+		_lastGameSate = GameLogic.Instance.CurrentRound.GameState;
 
         _targetPos = transform.position;
     }
 
     void FixedUpdate()
     {
-        var currentGameState = GameLogic.Instance.CurrentGameState;
+		var currentGameState = GameLogic.Instance.CurrentRound.GameState;
 
         if (currentGameState != _lastGameSate)
         {
@@ -57,7 +57,7 @@ public class CameraController : MonoBehaviour
 
     public void MoveByScreen(Vector3 diff)
     {
-        if (GameLogic.Instance.CurrentGameState != GameState.Menu)
+		if (GameLogic.Instance.CurrentRound.GameState != GameState.Menu)
         {
             return;
         }
@@ -68,7 +68,7 @@ public class CameraController : MonoBehaviour
 
     public void ZoomIn(float val)
     {
-        if (GameLogic.Instance.CurrentGameState != GameState.Menu)
+		if (GameLogic.Instance.CurrentRound.GameState != GameState.Menu)
         {
             return;
         }
@@ -81,7 +81,7 @@ public class CameraController : MonoBehaviour
 
     public void ZoomOut(float val)
     {
-        if (GameLogic.Instance.CurrentGameState != GameState.Menu)
+		if (GameLogic.Instance.CurrentRound.GameState != GameState.Menu)
         {
             return;
         }
@@ -96,7 +96,7 @@ public class CameraController : MonoBehaviour
     //***********************************
     private void UpdateMove()
     {
-        var currentPlayerTransform = GameLogic.Instance.GetCurrentPlayer().transform;
+        var currentPlayerTransform = GameLogic.Instance.CurrentRound.GetCurrentPlayer().transform;
 
         var targetCamPos = currentPlayerTransform.position + offset;
 
@@ -116,7 +116,7 @@ public class CameraController : MonoBehaviour
 
     private void SwitchCameraMode()
     {
-        if (GameLogic.Instance.CurrentGameState == GameState.Move)
+		if (GameLogic.Instance.CurrentRound.GameState == GameState.Move)
         {
             targetSiez = originalSize;
         }

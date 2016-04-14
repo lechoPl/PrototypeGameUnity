@@ -26,7 +26,7 @@ public class UIController : MonoBehaviour
     //***********************************
     private void RefreshTimer()
     {
-        if (GameLogic.Instance.GetTimeLeft() >= 0)
+		if (GameLogic.Instance.CurrentRound.GetTimeLeft() >= 0)
         {
             TimeLabel.text = GetTimeLeftString();
         }
@@ -36,17 +36,17 @@ public class UIController : MonoBehaviour
     {
         if (PlayerStatsPanel != null)
         {
-            PlayerStatsPanel.SetActive(GameLogic.Instance.CurrentGameState == GameState.Menu);
+			PlayerStatsPanel.SetActive(GameLogic.Instance.CurrentRound.GameState == GameState.Menu);
         }
         if (BottomPanel != null)
         {
-            BottomPanel.SetActive(GameLogic.Instance.CurrentGameState == GameState.Menu);
+			BottomPanel.SetActive(GameLogic.Instance.CurrentRound.GameState == GameState.Menu);
         }
     }
 
     private string GetTimeLeftString()
     {
-        float timeLeft = GameLogic.Instance.GetTimeLeft();
+		float timeLeft = GameLogic.Instance.CurrentRound.GetTimeLeft();
         int minutes = (int)Mathf.Abs(timeLeft / 60);
         int seconds = (int)Mathf.Abs(timeLeft - minutes * 60);
         return string.Format("{0:00}:{1:00}", minutes, seconds);

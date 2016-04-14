@@ -104,12 +104,12 @@ public class PlayerController : MonoBehaviour
 
     private bool CanPlayerMove()
     {
-        if (GameLogic.Instance.GetCurrentPlayer().Controller != this)
+		if (GameLogic.Instance.CurrentRound.GetCurrentPlayer().Controller != this)
         {
             return false;
         }
 
-        if (GameLogic.Instance.CheckRoundFinished())
+		if (GameLogic.Instance.CurrentRound.CheckRoundFinished())
         {
             return false;
         }

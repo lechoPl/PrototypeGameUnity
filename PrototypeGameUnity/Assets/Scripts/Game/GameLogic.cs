@@ -8,22 +8,16 @@ namespace Assets.Scripts.Game
 {
     public class GameLogic
     {
-        private static int DiceTimeMultiplier = 5;
-        public GameState CurrentGameState { get; private set; }
-        private IList<Player> Players { get; set; }
+        internal IList<Player> Players { get; set; }
         private IList<Field> Fields { get; set; }
 
-        private float roundStart = 0;
-        private float roundTime = 0;
-
-        public int CurrentPlayer { get; private set; }
+		public Round CurrentRound;
 
         public BoardSize BoardSize { get; private set; }
 
-        public bool MovementBlocked { get; private set; }
-
         // Public methods
         //***********************************
+
         #region players managing
 
         public void PlayerToNextField(Player p, int FieldId)
@@ -60,20 +54,9 @@ namespace Assets.Scripts.Game
             }
         }
 
-        public Player GetCurrentPlayer()
-        {
-            if (CurrentPlayer < 0 || CurrentPlayer >= Players.Count)
-            {
-                return null;
-            }
-
-            return Players[CurrentPlayer];
-        }
-
         #endregion
 
         #region fields managing
-        //***********************************
 
         public void RegisterField(Field field)
         {
@@ -149,67 +132,95 @@ namespace Assets.Scripts.Game
 
 
         #region round managing
-        //***********************************
 
-        public void StartRound(int DiceValue)
-        {
-            roundStart = Time.time;
-            roundTime = DiceTimeMultiplier * DiceValue;
-            MovementBlocked = false;
-            SetGameState(GameState.Move);
-        }
+		public class Round
+		{
+			public GameState GameState { get; internal set; }
+			
+			private static int DiceTimeMultiplier = 5;
 
-        public void EndRound()
-        {
-            CurrentPlayer = (CurrentPlayer + 1) % Players.Count;
-        }
+			private float roundStart = 0;
+			private float roundTime = 0;
+			
+			public bool MovementBlocked { get; internal set; }
+			
+			public int CurrentPlayer { get; internal set; }
 
-        public float GetRoundTime()
-        {
-            return Time.time - roundStart;
-        }
+			public void StartRound(int DiceValue)
+			{
+				roundStart = Time.time;
+				roundTime = DiceTimeMultiplier * DiceValue;
+				MovementBlocked = false;
+				SetGameState(GameState.Move);
+			}
+			
+			internal void PauseRound()
+			{
+				
+			}
+			
+			internal void ResumeRound() {
+				
+			}
+			
+			public void EndRound()
+			{
+				CurrentPlayer = (CurrentPlayer + 1) % GameLogic.Instance.Players.Count;
+			}
+			
+			public float GetRoundTime()
+			{
+				return Time.time - roundStart;
+			}
+			
+			public float GetTimeLeft()
+			{
+				return roundTime - GetRoundTime();
+			}
+			
+			public bool CheckRoundFinished()
+			{
+				if (GetTimeLeft() <= 0)
+				{
+					SetGameState(GameState.Menu);
+					BlockMovement();
+					return true;
+				}
+				return false;
+			}
 
-        public float GetTimeLeft()
-        {
-            return roundTime - GetRoundTime();
-        }
+			public Player GetCurrentPlayer()
+			{
+				if (CurrentPlayer < 0 || CurrentPlayer >= GameLogic.Instance.Players.Count)
+				{
+					return null;
+				}
+				
+				return GameLogic.Instance.Players[CurrentPlayer];
+			}
 
-        public bool CheckRoundFinished()
-        {
-            if (GetTimeLeft() <= 0)
-            {
-                SetGameState(GameState.Menu);
-                BlockMovement();
-                return true;
-            }
-            return false;
-        }
-        #endregion
-
-
-        #region game state managing
-        //***********************************
-
-        public void SetGameState(GameState state)
-        {
-            CurrentGameState = state;
-        }
-
-        // Private methods
-        private void BlockMovement()
-        {
-            MovementBlocked = true;
-        }
-        #endregion
-
-
-        private GameLogic()
+			public void SetGameState(GameState state)
+			{
+				this.GameState = state;
+			}
+			
+			// Private methods
+			internal void BlockMovement()
+			{
+				MovementBlocked = true;
+			}
+		}
+		#endregion
+		
+		
+		private GameLogic()
         {
             Players = new List<Player>();
             Fields = new List<Field>();
             BoardSize = new BoardSize();
+			CurrentRound = new Round();
 
-            CurrentGameState = GameState.Move;
+			CurrentRound.GameState = GameState.Move;
         }
 
         #region singleton pattern 

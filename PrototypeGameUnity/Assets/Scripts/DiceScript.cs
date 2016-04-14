@@ -87,7 +87,7 @@ public class DiceScript : MonoBehaviour
 	private IEnumerator DelayStart(float seconds)
 	{
 		yield return new WaitForSeconds(seconds);
-		GameLogic.Instance.StartRound(RollNumber);
+		GameLogic.Instance.CurrentRound.StartRound(RollNumber);
 	}
 
     private void OnMouseDown()
@@ -99,7 +99,7 @@ public class DiceScript : MonoBehaviour
     {
         if (!IsRolling)
         {
-            GameLogic.Instance.EndRound();
+            GameLogic.Instance.CurrentRound.EndRound();
 
             PrepareRoll();
         }
