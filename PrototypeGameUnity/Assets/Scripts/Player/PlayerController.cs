@@ -40,7 +40,6 @@ public class PlayerController : MonoBehaviour
     {
         if (!CanPlayerMove())
         {
-            Debug.Log("lipa :(");
             return;
         }
 

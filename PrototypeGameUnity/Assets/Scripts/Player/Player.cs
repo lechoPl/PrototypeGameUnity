@@ -53,11 +53,6 @@ public class Player : MonoBehaviour
         SetupPlayerMark();
     }
 
-	public void ChangeMoney(int amount)
-	{
-		Money += amount;
-	}
-
     #endregion
 
 
