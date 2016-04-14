@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Terrain2D : MonoBehaviour
 {
+    [HideInInspector]
     [SerializeField]
     public List<Vector3> KeyVertices = new List<Vector3>
                         {
@@ -17,6 +18,9 @@ public class Terrain2D : MonoBehaviour
 
     public Material material;
 
+    public bool CreateCollider;
+
+    [HideInInspector]
     public Terrain2DEditorSettings EditorSettings = new Terrain2DEditorSettings();
 
     private MeshFilter meshFilter
@@ -45,17 +49,22 @@ public class Terrain2D : MonoBehaviour
         }
     }
 
-    private MeshCollider meshCollider
+    private PolygonCollider2D polygonCollider2D
     {
         get
         {
-            var result = GetComponent<MeshCollider>();
+            var result = GetComponent<PolygonCollider2D>();
             if (result == null)
             {
-                result = gameObject.AddComponent<MeshCollider>();
+                result = gameObject.AddComponent<PolygonCollider2D>();
             }
             return result;
         }
+    }
+
+    void Awake()
+    {
+        SetupDataMesh();
     }
 
     public int GetKeyVerticeId(Vector3 mousePosition, float radius)
@@ -150,11 +159,43 @@ public class Terrain2D : MonoBehaviour
         Mesh msh = new Mesh();
         msh.vertices = KeyVertices.ToArray();
         msh.triangles = indices.ToArray();
+        msh.uv = GetUVMapping(KeyVertices).ToArray();
+
+        if (CreateCollider)
+        {
+            polygonCollider2D.points = KeyVertices.Select(v => new Vector2(v.x, v.y)).ToArray();
+        }
+
         msh.RecalculateNormals();
         msh.RecalculateBounds();
 
 
         meshRenderer.material = material;
         meshFilter.mesh = msh;
+    }
+
+    private IList<Vector2> GetUVMapping(IList<Vector3> verticies)
+    {
+        float textureHeight = material.mainTexture.height;
+        float textureWidth = material.mainTexture.width;
+
+        var uvs = new List<Vector2>();
+        for (int i = 0; i < verticies.Count; i++)
+        {
+            var vertex = verticies[i];
+
+            //Our standard uv mapping is just our point in space divided by the width and the height of our texture (assuming an x/y plane)
+            float xMapping = 0f;
+            float yMapping = 0f;
+
+            xMapping = vertex.x;
+            yMapping = vertex.y;
+
+            //Finally set the actual uv mapping
+            var uv = new Vector2(xMapping, yMapping);
+            uvs.Add(uv);
+        }
+
+        return uvs;
     }
 }

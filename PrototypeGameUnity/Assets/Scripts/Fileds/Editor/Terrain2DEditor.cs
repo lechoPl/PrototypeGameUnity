@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(Terrain2D))]
+[CanEditMultipleObjects]
 public class Terrain2DEditor : Editor
 {
     SerializedProperty keyVertices;
@@ -21,6 +22,15 @@ public class Terrain2DEditor : Editor
     private readonly Color HoverColor = Color.blue;
     private readonly Color SelectedColor = Color.white;
 
+    public new void Repaint()
+    {
+        if (terrain != null)
+        {
+            terrain.SetupDataMesh();
+        }
+
+        base.Repaint();
+    }
 
     void OnEnable()
     {
