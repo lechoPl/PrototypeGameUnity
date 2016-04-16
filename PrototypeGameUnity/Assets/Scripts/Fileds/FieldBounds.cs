@@ -7,7 +7,8 @@ public class FieldBounds : MonoBehaviour
     public int Height;
 
     private GameObject _bounds;
-    private GameObject Bounds {
+    private GameObject Bounds
+    {
         get
         {
             if (_bounds == null)

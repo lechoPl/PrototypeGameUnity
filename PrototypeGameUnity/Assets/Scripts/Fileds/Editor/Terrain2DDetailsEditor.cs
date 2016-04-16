@@ -1,21 +1,16 @@
-﻿using Assets.Scripts.Terrain.Enums;
+﻿
+using Assets.Scripts.Terrain.Enums;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(Terrain2D))]
+[CustomEditor(typeof(Terrain2DDetails))]
 [CanEditMultipleObjects]
-public class Terrain2DEditor : Editor
+public class Terrain2DDetailsEditor : Editor
 {
-    SerializedProperty editorSettings;
-    SerializedProperty editModeEnabled;
-    SerializedProperty mode;
-    SerializedProperty markSize;
-
-    private Terrain2D terrain;
+    private Terrain2DDetails terrainDetials;
     private int hoverVerticeId = -1;
     private int selectedVerticeId = -1;
 
-    private readonly Color FirstColor = Color.gray;
     private readonly Color AddDefaultColor = Color.green;
     private readonly Color DeleteDefaultColor = Color.red;
     private readonly Color MoveDefaultColor = Color.yellow;
@@ -24,9 +19,9 @@ public class Terrain2DEditor : Editor
 
     public new void Repaint()
     {
-        if (terrain != null)
+        if (terrainDetials != null)
         {
-            terrain.Setup();
+            terrainDetials.Setup();
         }
 
         base.Repaint();
@@ -34,65 +29,23 @@ public class Terrain2DEditor : Editor
 
     void OnEnable()
     {
-        terrain = target as Terrain2D;
+        terrainDetials = target as Terrain2DDetails;
 
-        if (terrain != null)
+        if (terrainDetials != null)
         {
-            terrain.Setup();
+            terrainDetials.Setup();
         }
-
-        editorSettings = serializedObject.FindProperty("EditorSettings");
-        editModeEnabled = editorSettings.FindPropertyRelative("editModeEnabled");
-        mode = editorSettings.FindPropertyRelative("mode");
-        markSize = editorSettings.FindPropertyRelative("markSize");
     }
 
 
     void OnDisable()
     {
-        terrain = null;
+        terrainDetials = null;
     }
-
-
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-
-        serializedObject.Update();
-
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Editor", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(editModeEnabled, new GUIContent("Edit Mode"));
-
-        if (editModeEnabled.boolValue)
-        {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.BeginVertical();
-
-            EditorGUILayout.HelpBox("Shortcuts:\n s - select mode\n d - delete mode\n a - add mode", MessageType.None);
-
-            EditorGUILayout.PropertyField(mode);
-            EditorGUILayout.PropertyField(markSize);
-
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndHorizontal();
-        }
-
-        serializedObject.ApplyModifiedProperties();
-
-        if(GUI.changed)
-        {
-            if (terrain != null)
-            {
-                terrain.Setup();
-            }
-        }
-    }
-
 
     void OnSceneGUI()
     {
-        if (terrain == null || !terrain.EditorSettings.editModeEnabled)
+        if (terrainDetials == null || !terrainDetials.editEnabled)
         {
             return;
         }
@@ -104,15 +57,15 @@ public class Terrain2DEditor : Editor
             switch (Event.current.keyCode)
             {
                 case KeyCode.A:
-                    terrain.EditorSettings.mode = EditMode.Add;
+                    terrainDetials.mode = EditMode.Add;
                     Event.current.Use();
                     break;
                 case KeyCode.S:
-                    terrain.EditorSettings.mode = EditMode.Move;
+                    terrainDetials.mode = EditMode.Move;
                     Event.current.Use();
                     break;
                 case KeyCode.D:
-                    terrain.EditorSettings.mode = EditMode.Delete;
+                    terrainDetials.mode = EditMode.Delete;
                     Event.current.Use();
                     break;
             }
@@ -141,7 +94,7 @@ public class Terrain2DEditor : Editor
         CheckHover();
 
         MarkKeyVertices();
-        terrain.Setup();
+        terrainDetials.Setup();
     }
 
 
@@ -152,15 +105,15 @@ public class Terrain2DEditor : Editor
             return;
         }
 
-        switch(terrain.EditorSettings.mode)
+        switch (terrainDetials.mode)
         {
             case EditMode.Move:
             case EditMode.Delete:
-                selectedVerticeId = terrain.GetKeyVerticeId(GetMousePositionInWold(), terrain.EditorSettings.markSize);
+                selectedVerticeId = terrainDetials.GetKeyVerticeId(GetMousePositionInWold(), terrainDetials.markSize);
                 break;
 
             case EditMode.Add:
-                selectedVerticeId = terrain.GetNewVerticeId(GetMousePositionInWold(), terrain.EditorSettings.markSize);
+                selectedVerticeId = terrainDetials.GetNewVerticeId(GetMousePositionInWold(), terrainDetials.markSize);
                 break;
         }
     }
@@ -173,9 +126,9 @@ public class Terrain2DEditor : Editor
             return;
         }
 
-        if (terrain.EditorSettings.mode == EditMode.Move)
+        if (terrainDetials.mode == EditMode.Move)
         {
-            terrain.MoveKeyVertex(selectedVerticeId, GetMousePositionInWold());
+            terrainDetials.MoveKeyVertex(selectedVerticeId, GetMousePositionInWold());
         }
 
         Event.current.Use();
@@ -189,14 +142,14 @@ public class Terrain2DEditor : Editor
             return;
         }
 
-        switch (terrain.EditorSettings.mode)
+        switch (terrainDetials.mode)
         {
             case EditMode.Delete:
-                terrain.DeleteKeyVertex(selectedVerticeId);
+                terrainDetials.DeleteKeyVertex(selectedVerticeId);
                 break;
 
             case EditMode.Add:
-                terrain.AddKeyVertex(selectedVerticeId, GetMousePositionInWold());
+                terrainDetials.AddKeyVertex(selectedVerticeId, GetMousePositionInWold());
                 break;
         }
 
@@ -219,15 +172,15 @@ public class Terrain2DEditor : Editor
             return;
         }
 
-        switch (terrain.EditorSettings.mode)
+        switch (terrainDetials.mode)
         {
             case EditMode.Move:
             case EditMode.Delete:
-                hoverVerticeId = terrain.GetKeyVerticeId(GetMousePositionInWold(), terrain.EditorSettings.markSize);
+                hoverVerticeId = terrainDetials.GetKeyVerticeId(GetMousePositionInWold(), terrainDetials.markSize);
                 break;
 
             case EditMode.Add:
-                hoverVerticeId = terrain.GetNewVerticeId(GetMousePositionInWold(), terrain.EditorSettings.markSize);
+                hoverVerticeId = terrainDetials.GetNewVerticeId(GetMousePositionInWold(), terrainDetials.markSize);
                 break;
         }
     }
@@ -245,10 +198,10 @@ public class Terrain2DEditor : Editor
             return HoverColor;
         }
 
-        switch(terrain.EditorSettings.mode)
+        switch (terrainDetials.mode)
         {
             case EditMode.Move:
-                return i == 0 ? FirstColor : MoveDefaultColor;
+                return MoveDefaultColor;
 
             case EditMode.Add:
                 return AddDefaultColor;
@@ -263,51 +216,68 @@ public class Terrain2DEditor : Editor
 
     private void MarkKeyVertices()
     {
-        if (terrain == null)
+        if (terrainDetials == null)
         {
             return;
         }
 
-        for (int i = 0; i < terrain.KeyVertices.Count; ++i)
+        for (int i = 0; i < terrainDetials.KeyVertices.Count; ++i)
         {
             Color color = GetMarkColor(i);
 
-            if (terrain.EditorSettings.mode == EditMode.Move || terrain.EditorSettings.mode == EditMode.Delete)
+            if (terrainDetials.mode == EditMode.Move || terrainDetials.mode == EditMode.Delete)
             {
 
-                var pos = terrain.transform.TransformPoint(terrain.KeyVertices[i]);
-                DrawMark(pos, terrain.EditorSettings.markSize, color);
+                var pos = terrainDetials.transform.TransformPoint(terrainDetials.KeyVertices[i]);
+                DrawMark(pos, terrainDetials.markSize, color);
+
+                if (i > 0)
+                {
+                    DrawLine(terrainDetials.transform.TransformPoint(terrainDetials.KeyVertices[i]), terrainDetials.transform.TransformPoint(terrainDetials.KeyVertices[i - 1]), color);
+                }
             }
 
-            if (terrain.EditorSettings.mode == EditMode.Add)
+            if (terrainDetials.mode == EditMode.Add)
             {
-                int prev = i - 1 < 0  ? terrain.KeyVertices.Count - 1 : i - 1;
+                if( i == 0)
+                {
+                    continue;
+                }
 
-                var v1 = terrain.transform.TransformPoint(terrain.KeyVertices[prev]);
-                var v2 = terrain.transform.TransformPoint(terrain.KeyVertices[i]);
+                var v1 = terrainDetials.transform.TransformPoint(terrainDetials.KeyVertices[i - 1]);
+                var v2 = terrainDetials.transform.TransformPoint(terrainDetials.KeyVertices[i]);
 
                 var pos = v1 + (v2 - v1) * 0.5f;
-                DrawMark(pos, terrain.EditorSettings.markSize, color);
+                DrawMark(pos, terrainDetials.markSize, color);
             }
         }
+    }
+
+    private void DrawLine(Vector3 p1, Vector3 p2, Color color)
+    {
+        Color previousHandleColor = Handles.color;
+
+        Handles.DrawLine(p1, p2);
+
+        Handles.color = previousHandleColor;
     }
 
     private void DrawMark(Vector3 position, float radius, Color color)
     {
         Color previousHandleColor = Handles.color;
         Handles.color = color;
-        if(terrain.EditorSettings.mode == EditMode.Move)
+        if (terrainDetials.mode == EditMode.Move)
         {
             Handles.DrawSolidDisc(position, Vector3.forward, radius);
         }
 
-        if (terrain.EditorSettings.mode == EditMode.Delete)
+        if (terrainDetials.mode == EditMode.Delete)
         {
             Handles.DrawWireDisc(position, Vector3.right, radius);
             Handles.DrawWireDisc(position, Vector3.forward, radius);
         }
 
-        if(terrain.EditorSettings.mode == EditMode.Add)
+        if (terrainDetials.mode == EditMode.Add)
         {
             Handles.DrawSolidDisc(position, Vector3.forward, radius);
         }
