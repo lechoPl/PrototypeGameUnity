@@ -26,7 +26,6 @@ public class ScreenInput : MonoBehaviour
 
         if (Input.GetMouseButton(_mouseButton) || Input.GetMouseButtonUp(_mouseButton))
         {
-            Debug.Log("test");
             var diff = Input.mousePosition - _lastPosition;
 
             CameraController.MoveByScreen(diff * Sensivity * SensivityBySize);

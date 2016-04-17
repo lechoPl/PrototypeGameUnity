@@ -292,8 +292,6 @@ public class Terrain2D : MonoBehaviour
 
     private DetailType GetDetailType(Vector3 current, Vector3 next)
     {
-        DetailType result;
-
         var lastType = TerrainDetails.Last().type;
 
         if (lastType == DetailType.Side)
@@ -356,11 +354,11 @@ public class Terrain2D : MonoBehaviour
                 break;
 
             case DetailType.Side:
-                pos.z -= 0.01f;
+                pos.z -= 0.02f;
                 break;
 
             case DetailType.Bottom:
-                pos.z -= 0.02f;
+                pos.z -= 0.01f;
                 break;
         }
 

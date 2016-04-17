@@ -20,6 +20,8 @@ public class Terrain2DDetails : MonoBehaviour
 
     public float markSize = 0.5f;
 
+    public List<Vector2> UVmapping = new List<Vector2>();
+
     [SerializeField]
     private MeshFilter meshFilter
     {
@@ -81,7 +83,7 @@ public class Terrain2DDetails : MonoBehaviour
         Mesh msh = new Mesh();
         msh.vertices = vertices.ToArray();
         msh.triangles = indices.ToArray();
-        msh.uv = GetUVMapping(vertices).ToArray();
+        msh.uv = GetUVMapping(vertices, material).ToArray();
 
         msh.RecalculateNormals();
         msh.RecalculateBounds();
@@ -188,22 +190,26 @@ public class Terrain2DDetails : MonoBehaviour
         return result;
     }
 
-    private IList<Vector2> GetUVMapping(IList<Vector3> verticies)
+    private IList<Vector2> GetUVMapping(IList<Vector3> verticies, Material material)
     {
         var uvs = new List<Vector2>();
-        for (int i = 0; i < verticies.Count; i++)
+        
+        float xMapping = 0f;
+
+        var uvs_temp = new List<Vector2>();
+
+        for (int i = 0; i < verticies.Count / 2; ++i)
         {
-            var vertex = verticies[i];
+            xMapping = i == 0 ? 0f : xMapping + (verticies[i] - verticies[i - 1]).magnitude;
 
-            //Our standard uv mapping is just our point in space divided by the width and the height of our texture (assuming an x/y plane)
-            float xMapping = vertex.x;
-            float yMapping = vertex.y;
-
-            //Finally set the actual uv mapping
-            var uv = new Vector2(xMapping, yMapping);
-            uvs.Add(uv);
+            uvs.Add(new Vector2(xMapping, 1f));
+            uvs_temp.Add(new Vector2(xMapping, 0f));
         }
 
+        uvs_temp.Reverse();
+        uvs.AddRange(uvs_temp);
+
+        UVmapping = uvs;
         return uvs;
     }
 
