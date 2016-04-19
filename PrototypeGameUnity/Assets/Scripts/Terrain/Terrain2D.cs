@@ -1,5 +1,7 @@
-﻿using Assets.Scripts.Terrain.Utilities;
+﻿using Assets.Scripts.Terrain.Enums;
+using Assets.Scripts.Terrain.Utilities;
 using Assets.Scripts.Terrain.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,9 +19,30 @@ public class Terrain2D : MonoBehaviour
                         };
 
     [HideInInspector]
+    [SerializeField]
+    public List<Terrain2DDetails> TerrainDetails = new List<Terrain2DDetails>();
+
+    [HideInInspector]
     public Terrain2DEditorSettings EditorSettings = new Terrain2DEditorSettings();
 
     public Material material;
+
+
+    [Range(1, 89)]
+    public float maxTopSideAngle = 60f;
+    [Range(1, 89)]
+    public float maxBottomSideAngle = 60f;
+    [Range(1, 179)]
+    public float breakTopDetailAngle = 60f;
+    [Range(1, 179)]
+    public float breakSideDetailAngle = 60f;
+    [Range(1, 179)]
+    public float breakBottomDetailAngle = 60f;
+
+    public float DetialsHeight = 0.5f;
+    public Material topMaterial;
+    public Material sideMaterial;
+    public Material bottomMaterial;
 
     public bool CreateCollider;
 
@@ -65,8 +88,7 @@ public class Terrain2D : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log("test");
-        SetupDataMesh();
+        Setup();
     }
 
     public int GetKeyVerticeId(Vector3 mousePosition, float radius)
@@ -153,6 +175,12 @@ public class Terrain2D : MonoBehaviour
         KeyVertices.Insert(id, newVertex);
     }
 
+    public void Setup()
+    {
+        SetupDataMesh();
+        SetupTerrainDetails();
+    }
+
     public void SetupDataMesh()
     {
         var indices = Triangulator.Triangulate(KeyVertices);
@@ -167,6 +195,10 @@ public class Terrain2D : MonoBehaviour
         {
             polygonCollider2D.points = KeyVertices.Select(v => new Vector2(v.x, v.y)).ToArray();
         }
+        else
+        {
+            DestroyImmediate(polygonCollider2D);
+        }
 
         msh.RecalculateNormals();
         msh.RecalculateBounds();
@@ -174,6 +206,190 @@ public class Terrain2D : MonoBehaviour
 
         meshRenderer.material = material;
         meshFilter.mesh = msh;
+    }
+
+    public void SetupTerrainDetails()
+    {
+        for (int i = 0; i < TerrainDetails.Count; ++i)
+        {
+            if (TerrainDetails[i] != null && TerrainDetails[i].gameObject != null)
+            {
+                DestroyImmediate(TerrainDetails[i].gameObject);
+            }
+        }
+        TerrainDetails.Clear();
+
+        DetailType detailType = DetailType.Side;
+        List<Vector3> detailKeyVertices = new List<Vector3>();
+
+        for (int i = 0; i < KeyVertices.Count; ++i)
+        {
+            if (i == 0)
+            {
+                detailKeyVertices.Add(KeyVertices[i]);
+
+                Vector3 first = (KeyVertices[1] - KeyVertices[0]).normalized;
+                var angle = Vector3.Angle(first, Vector3.up);
+
+                if (angle < maxBottomSideAngle || angle > 180 - maxBottomSideAngle)
+                {
+                    detailType = DetailType.Side;
+                }
+                else
+                {
+                    detailType = DetailType.Top;
+                }
+            }
+            else
+            {
+                detailKeyVertices.Add(KeyVertices[i]);
+
+                int nextId = i < KeyVertices.Count - 1 ? i + 1 : 0;
+                Vector3 next = (KeyVertices[nextId] - KeyVertices[i]).normalized;
+                Vector3 current = (KeyVertices[i] - KeyVertices[i - 1]).normalized;
+
+                var angle = Vector3.Angle(next, current);
+                float breakAngle = GetBreakAngle(detailType);
+
+                if (angle > breakAngle)
+                {
+                    TerrainDetails.Add(CreateTerrain2DDetails(detailKeyVertices, detailType));
+                    detailKeyVertices = new List<Vector3>();
+                    detailKeyVertices.Add(KeyVertices[i]);
+
+                    if (TerrainDetails.Count > 0)
+                    {
+                        detailType = GetDetailType(current, next);
+                    }
+                }
+
+                if (i == KeyVertices.Count - 1)
+                {
+                    detailKeyVertices.Add(KeyVertices[nextId]);
+                    TerrainDetails.Add(CreateTerrain2DDetails(detailKeyVertices, detailType));
+                }
+            }
+        }
+    }
+
+    private float GetBreakAngle(DetailType type)
+    {
+        switch (type)
+        {
+            case DetailType.Top:
+                return breakTopDetailAngle;
+
+            case DetailType.Side:
+                return breakSideDetailAngle;
+
+            case DetailType.Bottom:
+                return breakBottomDetailAngle;
+
+            default:
+                return 70f;
+        }
+    }
+
+    private DetailType GetDetailType(Vector3 current, Vector3 next)
+    {
+        var lastType = TerrainDetails.Last().type;
+
+        if (lastType == DetailType.Side)
+        {
+            if (current.y > 0)
+            {
+                return next.x < 0 ? DetailType.Bottom : DetailType.Top;
+            }
+            else
+            {
+                return next.x < 0 ? DetailType.Bottom : DetailType.Top;
+            }
+        }
+
+        if (lastType == DetailType.Bottom)
+        {
+            if (current.x < 0 && next.x < 0)
+            {
+                return DetailType.Side;
+            }
+
+            var angle = Vector3.Angle(next, Vector3.up);
+
+            if (angle < maxBottomSideAngle || angle > 180 - maxBottomSideAngle)
+            {
+                return DetailType.Side;
+            }
+            else
+            {
+                return DetailType.Top;
+            }
+        }
+
+        if (lastType == DetailType.Top)
+        {
+            var angle = Vector3.Angle(next, Vector3.up);
+
+            if (angle < maxTopSideAngle || angle > 180 - maxTopSideAngle)
+            {
+                return DetailType.Side;
+            }
+            else
+            {
+                return DetailType.Bottom;
+            }
+        }
+
+        throw new NotImplementedException();
+    }
+
+    private Terrain2DDetails CreateTerrain2DDetails(List<Vector3> detailsKeyVertices, DetailType type)
+    {
+        var details = new GameObject("Details");
+
+        var pos = transform.position;
+        switch (type)
+        {
+            case DetailType.Top:
+                pos.z -= 0.03f;
+                break;
+
+            case DetailType.Side:
+                pos.z -= 0.02f;
+                break;
+
+            case DetailType.Bottom:
+                pos.z -= 0.01f;
+                break;
+        }
+
+        details.transform.position = pos;
+        details.transform.rotation = transform.rotation;
+        details.transform.localScale = transform.localScale;
+        details.transform.parent = transform;
+
+        var detailsComponent = details.AddComponent<Terrain2DDetails>();
+        detailsComponent.KeyVertices = detailsKeyVertices;
+        detailsComponent.heigth = DetialsHeight;
+        detailsComponent.type = type;
+
+        switch (type)
+        {
+            case DetailType.Top:
+                detailsComponent.material = topMaterial;
+                break;
+
+            case DetailType.Side:
+                detailsComponent.material = sideMaterial;
+                break;
+
+            case DetailType.Bottom:
+                detailsComponent.material = bottomMaterial;
+                break;
+        }
+
+        detailsComponent.Setup();
+
+        return detailsComponent;
     }
 
     private IList<Vector2> GetUVMapping(IList<Vector3> verticies)

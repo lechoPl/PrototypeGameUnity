@@ -6,7 +6,6 @@ using UnityEngine;
 [CanEditMultipleObjects]
 public class Terrain2DEditor : Editor
 {
-    SerializedProperty keyVertices;
     SerializedProperty editorSettings;
     SerializedProperty editModeEnabled;
     SerializedProperty mode;
@@ -16,6 +15,7 @@ public class Terrain2DEditor : Editor
     private int hoverVerticeId = -1;
     private int selectedVerticeId = -1;
 
+    private readonly Color FirstColor = Color.gray;
     private readonly Color AddDefaultColor = Color.green;
     private readonly Color DeleteDefaultColor = Color.red;
     private readonly Color MoveDefaultColor = Color.yellow;
@@ -26,7 +26,7 @@ public class Terrain2DEditor : Editor
     {
         if (terrain != null)
         {
-            terrain.SetupDataMesh();
+            terrain.Setup();
         }
 
         base.Repaint();
@@ -38,10 +38,9 @@ public class Terrain2DEditor : Editor
 
         if (terrain != null)
         {
-            terrain.SetupDataMesh();
+            terrain.Setup();
         }
 
-        keyVertices = serializedObject.FindProperty("KeyVertices");
         editorSettings = serializedObject.FindProperty("EditorSettings");
         editModeEnabled = editorSettings.FindPropertyRelative("editModeEnabled");
         mode = editorSettings.FindPropertyRelative("mode");
@@ -75,8 +74,6 @@ public class Terrain2DEditor : Editor
             EditorGUILayout.PropertyField(mode);
             EditorGUILayout.PropertyField(markSize);
 
-            EditorGUILayout.PropertyField(keyVertices);
-
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
         }
@@ -87,7 +84,7 @@ public class Terrain2DEditor : Editor
         {
             if (terrain != null)
             {
-                terrain.SetupDataMesh();
+                terrain.Setup();
             }
         }
     }
@@ -144,7 +141,7 @@ public class Terrain2DEditor : Editor
         CheckHover();
 
         MarkKeyVertices();
-        terrain.SetupDataMesh();
+        terrain.Setup();
     }
 
 
@@ -251,7 +248,7 @@ public class Terrain2DEditor : Editor
         switch(terrain.EditorSettings.mode)
         {
             case EditMode.Move:
-                return MoveDefaultColor;
+                return i == 0 ? FirstColor : MoveDefaultColor;
 
             case EditMode.Add:
                 return AddDefaultColor;
