@@ -6,7 +6,7 @@ using UnityEngine;
 public class Field : MonoBehaviour
 {
     public int Id { get; private set; }
-    public Player Ovner { get; private set; }
+    public Player Owner { get; private set; }
     public int Price = 100;
     public TextMesh Text;
 
@@ -63,8 +63,8 @@ public class Field : MonoBehaviour
     //***********************************
     public void SetOwner(Player player)
     {
-        Ovner = player;
-        Text.text = Ovner.name + " owns this field.";
+        Owner = player;
+        Text.text = Owner.name + " owns this field.";
     }
 
     public void SetFieldName(string name)
