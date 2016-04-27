@@ -141,7 +141,6 @@ public class Terrain2DEditor : Editor
         CheckHover();
 
         MarkKeyVertices();
-        terrain.Setup();
     }
 
 
@@ -176,6 +175,7 @@ public class Terrain2DEditor : Editor
         if (terrain.EditorSettings.mode == EditMode.Move)
         {
             terrain.MoveKeyVertex(selectedVerticeId, GetMousePositionInWold());
+            terrain.Setup();
         }
 
         Event.current.Use();
@@ -193,10 +193,12 @@ public class Terrain2DEditor : Editor
         {
             case EditMode.Delete:
                 terrain.DeleteKeyVertex(selectedVerticeId);
+                terrain.Setup();
                 break;
 
             case EditMode.Add:
                 terrain.AddKeyVertex(selectedVerticeId, GetMousePositionInWold());
+                terrain.Setup();
                 break;
         }
 

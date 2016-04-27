@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Terrain.Enums;
-using Assets.Scripts.Terrain.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -76,20 +75,37 @@ public class Terrain2DDetails : MonoBehaviour
         }
 
         var vertices = CreateVertices();
-        /// something going wrong when start point and end poit are the same -- probably bug or wrong algorithm in Traingulator
-        var indices = Triangulator.Triangulate(vertices);
 
         // Create the mesh
         Mesh msh = new Mesh();
         msh.vertices = vertices.ToArray();
-        msh.triangles = indices.ToArray();
-        msh.uv = GetUVMapping(vertices, material).ToArray();
+        msh.triangles = GetIndices(vertices).ToArray();
+        msh.uv = GetUVMapping(vertices).ToArray();
 
         msh.RecalculateNormals();
         msh.RecalculateBounds();
 
         meshRenderer.material = material;
         meshFilter.mesh = msh;
+    }
+
+    private IList<int> GetIndices(List<Vector3> vertices)
+    {
+        var result = new List<int>();
+
+        int n = vertices.Count;
+        for (int i = 0; i < n / 2; ++i)
+        {
+            result.Add(i);
+            result.Add(i + 1);
+            result.Add(n - i - 1);
+
+            result.Add(i + 1);
+            result.Add(n - i - 2);
+            result.Add(n - i - 1);
+        }
+
+        return result;
     }
 
     private List<Vector3> CreateVertices()
@@ -190,10 +206,10 @@ public class Terrain2DDetails : MonoBehaviour
         return result;
     }
 
-    private IList<Vector2> GetUVMapping(IList<Vector3> verticies, Material material)
+    private IList<Vector2> GetUVMapping(IList<Vector3> verticies)
     {
         var uvs = new List<Vector2>();
-        
+
         float xMapping = 0f;
 
         var uvs_temp = new List<Vector2>();

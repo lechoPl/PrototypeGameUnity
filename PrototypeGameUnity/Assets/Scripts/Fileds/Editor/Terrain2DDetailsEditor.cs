@@ -94,7 +94,6 @@ public class Terrain2DDetailsEditor : Editor
         CheckHover();
 
         MarkKeyVertices();
-        terrainDetials.Setup();
     }
 
 
@@ -129,6 +128,7 @@ public class Terrain2DDetailsEditor : Editor
         if (terrainDetials.mode == EditMode.Move)
         {
             terrainDetials.MoveKeyVertex(selectedVerticeId, GetMousePositionInWold());
+            terrainDetials.Setup();
         }
 
         Event.current.Use();
@@ -146,10 +146,12 @@ public class Terrain2DDetailsEditor : Editor
         {
             case EditMode.Delete:
                 terrainDetials.DeleteKeyVertex(selectedVerticeId);
+                terrainDetials.Setup();
                 break;
 
             case EditMode.Add:
                 terrainDetials.AddKeyVertex(selectedVerticeId, GetMousePositionInWold());
+                terrainDetials.Setup();
                 break;
         }
 
@@ -201,7 +203,12 @@ public class Terrain2DDetailsEditor : Editor
         switch (terrainDetials.mode)
         {
             case EditMode.Move:
-                return MoveDefaultColor;
+                if (i == 0)
+                    return Color.gray;
+                if (i % 2 == 0)
+                    return Color.cyan;
+                else
+                    return MoveDefaultColor;
 
             case EditMode.Add:
                 return AddDefaultColor;
@@ -239,7 +246,7 @@ public class Terrain2DDetailsEditor : Editor
 
             if (terrainDetials.mode == EditMode.Add)
             {
-                if( i == 0)
+                if (i == 0)
                 {
                     continue;
                 }
