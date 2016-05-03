@@ -19,8 +19,6 @@ public class Terrain2DDetails : MonoBehaviour
 
     public float markSize = 0.5f;
 
-    public List<Vector2> UVmapping = new List<Vector2>();
-
     [SerializeField]
     private MeshFilter meshFilter
     {
@@ -219,13 +217,18 @@ public class Terrain2DDetails : MonoBehaviour
             xMapping = i == 0 ? 0f : xMapping + (verticies[i] - verticies[i - 1]).magnitude;
 
             uvs.Add(new Vector2(xMapping, 1f));
+        }
+
+        xMapping = 0f;
+        for (int i = verticies.Count - 1; i >= verticies.Count / 2; --i)
+        {
+            xMapping = i == verticies.Count - 1 ? 0f : xMapping + (verticies[i] - verticies[i + 1]).magnitude;
             uvs_temp.Add(new Vector2(xMapping, 0f));
         }
 
         uvs_temp.Reverse();
         uvs.AddRange(uvs_temp);
 
-        UVmapping = uvs;
         return uvs;
     }
 
