@@ -210,6 +210,12 @@ public class Terrain2D : MonoBehaviour
 
     public void SetupTerrainDetails()
     {
+        if(!transform)
+        {
+            Debug.Log("transform is null");
+            return;
+        }
+
         for (int i = 0; i < TerrainDetails.Count; ++i)
         {
             if (TerrainDetails[i] != null && TerrainDetails[i].gameObject != null)

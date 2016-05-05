@@ -12,8 +12,8 @@ public class PlayerController : MonoBehaviour
     public int maxJumpCount = 2;
 
     [Header("Ground Detection")]
-    public Transform GroundCheck;
-    public float GroundCheckRadius = 0.01f;
+    public Transform GroundCheck1;
+    public Transform GroundCheck2;
     public LayerMask GroundMask;
 
     private Rigidbody2D _rigidbody;
@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        isGrounded = Physics2D.OverlapCircleAll(GroundCheck.position, GroundCheckRadius, GroundMask).Count(c => c != _collider) > 0;
+        isGrounded = Physics2D.OverlapAreaAll(GroundCheck1.position, GroundCheck2.position, GroundMask).Count(c => c != _collider) > 0;
         if (isGrounded)
         {
             _lastMove = _lastMove + 100f; // to fix bug after reset velocity;
@@ -104,12 +104,17 @@ public class PlayerController : MonoBehaviour
 
     private bool CanPlayerMove()
     {
-		if (GameLogic.Instance.CurrentRound.GetCurrentPlayer().Controller != this)
+        if(GameLogic.Instance.DebugMode)
+        {
+            return true;
+        }
+
+        if (GameLogic.Instance.CurrentRound.GetCurrentPlayer().Controller != this)
         {
             return false;
         }
 
-		if (GameLogic.Instance.CurrentRound.CheckRoundFinished())
+        if (GameLogic.Instance.CurrentRound.CheckRoundFinished())
         {
             return false;
         }

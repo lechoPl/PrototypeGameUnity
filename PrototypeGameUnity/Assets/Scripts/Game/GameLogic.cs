@@ -8,6 +8,8 @@ namespace Assets.Scripts.Game
 {
     public class GameLogic
     {
+        public bool DebugMode { get; set; }
+
         internal IList<Player> Players { get; set; }
         private IList<Field> Fields { get; set; }
 
@@ -100,16 +102,7 @@ namespace Assets.Scripts.Game
 
             var field = Fields[fieldNumber];
 
-            var top = field.transform.position.y + field.Bounds.Height / 2f;
-            var down = field.transform.position.y - field.Bounds.Height / 2f;
-            var left = field.transform.position.x - field.Bounds.Width / 2f;
-            var right = field.transform.position.x + field.Bounds.Width / 2f;
-
-            return Players.Where(p =>
-                                 top > p.transform.position.y &&
-                                 down < p.transform.position.y &&
-                                 left < p.transform.position.x &&
-                                 right > p.transform.position.x).ToList();
+            return Players.Where(p => field.Bounds.IsIn(p.transform.position)).ToList();
         }
 
         #endregion
@@ -130,89 +123,6 @@ namespace Assets.Scripts.Game
         }
         #endregion
 
-
-        #region round managing
-
-		public class Round
-		{
-			public GameState GameState { get; internal set; }
-			
-			private static int DiceTimeMultiplier = 5;
-
-			private float roundStart = 0;
-			private float roundTime = 0;
-			
-			public bool MovementBlocked { get; internal set; }
-			
-			public int CurrentPlayer { get; internal set; }
-
-			public void StartRound(int DiceValue)
-			{
-				roundStart = Time.time;
-				roundTime = DiceTimeMultiplier * DiceValue;
-				MovementBlocked = false;
-				SetGameState(GameState.Move);
-			}
-			
-			internal void PauseRound()
-			{
-				
-			}
-			
-			internal void ResumeRound() {
-				
-			}
-			
-			public void EndRound()
-			{
-				CurrentPlayer = (CurrentPlayer + 1) % GameLogic.Instance.Players.Count;
-			}
-			
-			public float GetRoundTime()
-			{
-				return Time.time - roundStart;
-			}
-			
-			public float GetTimeLeft()
-			{
-				return roundTime - GetRoundTime();
-			}
-			
-			public bool CheckRoundFinished()
-			{
-				if (GetTimeLeft() <= 0)
-				{
-					SetGameState(GameState.Menu);
-					BlockMovement();
-					return true;
-				}
-				return false;
-			}
-
-			public Player GetCurrentPlayer()
-			{
-				if (CurrentPlayer < 0 || CurrentPlayer >= GameLogic.Instance.Players.Count)
-				{
-					return null;
-				}
-				
-				return GameLogic.Instance.Players[CurrentPlayer];
-			}
-
-			public void SetGameState(GameState state)
-			{
-				this.GameState = state;
-			}
-			
-			// Private methods
-			internal void BlockMovement()
-			{
-				MovementBlocked = true;
-			}
-		}
-		#endregion
-		
-		
 		private GameLogic()
         {
             Players = new List<Player>();
@@ -237,6 +147,7 @@ namespace Assets.Scripts.Game
                 return _instance;
             }
         }
+
         #endregion
     }
 }

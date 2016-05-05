@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class FieldBounds : MonoBehaviour
 {
-    public int Width;
-    public int Height;
+    public int Width; // should be set by SetWidth
+    public int Height; // should be set by SetHeight
 
     private GameObject _bounds;
     private GameObject Bounds
@@ -35,12 +35,17 @@ public class FieldBounds : MonoBehaviour
     private GameObject LeftBound;
     private GameObject RightBound;
 
+    void Awake()
+    {
+        ClearBounds();
+        Setup();
+    }
+
     public void SetWidth(int val)
     {
         Width = val;
         SetupBoundsWidth();
     }
-
 
     public void SetHeight(int val)
     {
@@ -48,36 +53,10 @@ public class FieldBounds : MonoBehaviour
         SetupBoundsHeight();
     }
 
-    void Awake()
-    {
-        ClearBounds();
-        Setup();
-    }
-
     public void Setup()
     {
         SetupBoundsWidth();
         SetupBoundsHeight();
-    }
-
-    public void SetupBoundsWidth()
-    {
-        CheckBounds();
-
-        TopBound.transform.localScale += (-TopBound.transform.localScale) + new Vector3(Width, 1f, 1f);
-        DownBound.transform.localScale += (-DownBound.transform.localScale) + new Vector3(Width, 1f, 1f);
-        LeftBound.transform.position += new Vector3(-Width / 2f, 0f, 0f);
-        RightBound.transform.position += new Vector3(Width / 2f, 0f, 0f);
-    }
-
-    public void SetupBoundsHeight()
-    {
-        CheckBounds();
-
-        TopBound.transform.position += new Vector3(0f, Height / 2f, 0f);
-        DownBound.transform.position += new Vector3(0f, -Height / 2f, 0f);
-        LeftBound.transform.localScale += (-LeftBound.transform.localScale) + new Vector3(1f, Height, 1f);
-        RightBound.transform.localScale += (-RightBound.transform.localScale) + new Vector3(1f, Height, 1f);
     }
 
     public void ClearBounds()
@@ -98,6 +77,19 @@ public class FieldBounds : MonoBehaviour
         {
             DestroyImmediate(child);
         }
+    }
+
+    public bool IsIn(Vector3 point)
+    {
+        var top = transform.position.y + Height / 2f;
+        var down = transform.position.y - Height / 2f;
+        var left = transform.position.x - Width / 2f;
+        var right = transform.position.x + Width / 2f;
+
+        return top > point.y &&
+               down < point.y &&
+               left < point.x &&
+               right > point.x;
     }
 
     private void CheckBounds()
@@ -149,5 +141,25 @@ public class FieldBounds : MonoBehaviour
         bound.transform.parent = Bounds.transform;
 
         return bound;
+    }
+
+    private void SetupBoundsWidth()
+    {
+        CheckBounds();
+
+        TopBound.transform.localScale += (-TopBound.transform.localScale) + new Vector3(Width, 1f, 1f);
+        DownBound.transform.localScale += (-DownBound.transform.localScale) + new Vector3(Width, 1f, 1f);
+        LeftBound.transform.position += new Vector3(-Width / 2f, 0f, 0f);
+        RightBound.transform.position += new Vector3(Width / 2f, 0f, 0f);
+    }
+
+    private void SetupBoundsHeight()
+    {
+        CheckBounds();
+
+        TopBound.transform.position += new Vector3(0f, Height / 2f, 0f);
+        DownBound.transform.position += new Vector3(0f, -Height / 2f, 0f);
+        LeftBound.transform.localScale += (-LeftBound.transform.localScale) + new Vector3(1f, Height, 1f);
+        RightBound.transform.localScale += (-RightBound.transform.localScale) + new Vector3(1f, Height, 1f);
     }
 }

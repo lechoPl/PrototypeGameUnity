@@ -13,8 +13,7 @@ public class FieldBoundsEditor : Editor
             var fieldsGenerator = target as FieldBounds;
 
             fieldsGenerator.ClearBounds();
-            fieldsGenerator.SetupBoundsWidth();
-            fieldsGenerator.SetupBoundsHeight();
+            fieldsGenerator.Setup();
         }
     }
 }

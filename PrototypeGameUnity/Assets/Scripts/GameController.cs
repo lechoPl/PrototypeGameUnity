@@ -4,24 +4,32 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    //for Debug
+    [Header("Debug options")]
+    public bool DebugMode = false;
+    public GameState startGameState = GameState.Menu;
+
     // MonoBehavior methods
     //***********************************
-    void Update ()
+    public void Awake()
     {
-        CheckInput();
-		GameLogic.Instance.CurrentRound.CheckRoundFinished ();
-	}
+        GameLogic.Instance.DebugMode = DebugMode;
 
-    // Public methods
-    //***********************************
-    public void EndRound()
-    {
-		GameLogic.Instance.CurrentRound.EndRound();
+        if(GameLogic.Instance.DebugMode)
+        {
+            GameLogic.Instance.CurrentRound.GameState = startGameState;
+        }
     }
 
-	public void StartRound() {
+    void Update()
+    {
+        CheckInput();
 
-	}
+        if (!GameLogic.Instance.DebugMode)
+        {
+            GameLogic.Instance.CurrentRound.CheckRoundFinished();
+        }
+    }
 
     // Private methods
     //***********************************
@@ -29,21 +37,20 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-			if(GameLogic.Instance.CurrentRound.GameState == GameState.Move)
+            if (GameLogic.Instance.CurrentRound.GameState == GameState.Move)
             {
-				GameLogic.Instance.CurrentRound.SetGameState(GameState.Menu);
+                GameLogic.Instance.CurrentRound.GameState = GameState.Menu;
             }
             else
             {
-				GameLogic.Instance.CurrentRound.SetGameState(GameState.Move);
-
+                GameLogic.Instance.CurrentRound.GameState = GameState.Move;
             }
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
-			Player player = GameLogic.Instance.CurrentRound.GetCurrentPlayer();
-			Field field = GameLogic.Instance.CurrentRound.GetCurrentPlayer().CurrentField;
+            Player player = GameLogic.Instance.CurrentRound.GetCurrentPlayer();
+            Field field = GameLogic.Instance.CurrentRound.GetCurrentPlayer().CurrentField;
             GameLogic.Instance.BuyField(player, field);
         }
     }
