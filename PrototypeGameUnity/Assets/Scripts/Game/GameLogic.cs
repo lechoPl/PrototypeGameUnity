@@ -54,6 +54,11 @@ namespace Assets.Scripts.Game
             }
         }
 
+		public Player GetPlayer(int id)
+		{
+			return Players[id];
+		}
+
         #endregion
 
         #region fields managing
@@ -116,18 +121,44 @@ namespace Assets.Scripts.Game
 
 
         #region monopoly part
-        public void BuyField(Player player, Field field)
-        {
-            if (player.Money >= field.Price)
-            {
-                if (field.Ovner != null)
-                {
-                    field.Ovner.Money += field.Price;
-                }
-                field.SetOwner(player);
-                player.Money -= field.Price;
-            }
-        }
+		public void FinalizeTrade(Player playerA, ITradeable itemA, Player playerB, ITradeable itemB)
+		{
+			if((playerA == null || playerA.Has (itemA)) && (playerB == null || playerB.Has (itemB)))
+		    {
+				itemA.TakeFromPlayer(playerA, itemA.GetAmount());
+				itemB.TakeFromPlayer (playerB, itemB.GetAmount());
+				itemA.GiveToPlayer(playerB, itemA.GetAmount());
+				itemB.GiveToPlayer(playerA, itemB.GetAmount());
+			}
+		}
+
+		public void RequestTrade(Player playerA, ITradeable itemA, Player playerB, ITradeable itemB)
+		{
+			if(playerA == playerB)
+			{
+				return;
+			}
+
+			if(playerB == null)
+			{
+				Money money = itemA as Money;
+				Field field = itemB as Field;
+				if(money != null && field != null && money.GetAmount () >= field.Price)
+				{
+					FinalizeTrade(playerA, itemA, playerB, itemB);
+				}
+				return;
+			}
+			
+			TradeMessage tradeMessage = new TradeMessage(playerA, itemA, playerB, itemB);
+
+			if(playerA != null)
+			{
+				playerA.Messages.Add (tradeMessage);
+				playerB.Messages.Add (tradeMessage);
+			}
+		}
+
         #endregion
 
 
@@ -137,14 +168,15 @@ namespace Assets.Scripts.Game
 		{
 			public GameState GameState { get; internal set; }
 			
-			private static int DiceTimeMultiplier = 5;
+			private static int DiceTimeMultiplier = 3;
 
 			private float roundStart = 0;
+			private float roundPause = 0;
 			private float roundTime = 0;
 			
 			public bool MovementBlocked { get; internal set; }
 			
-			public int CurrentPlayer { get; internal set; }
+			internal int CurrentPlayer;
 
 			public void StartRound(int DiceValue)
 			{
@@ -156,11 +188,14 @@ namespace Assets.Scripts.Game
 			
 			internal void PauseRound()
 			{
-				
+				GameState = GameState.Pause;
+				roundPause = Time.time;
 			}
 			
-			internal void ResumeRound() {
-				
+			internal void ResumeRound() 
+			{
+				GameState = GameState.Move;
+				roundStart = Time.time - (roundPause - roundStart);
 			}
 			
 			public void EndRound()
@@ -170,7 +205,11 @@ namespace Assets.Scripts.Game
 			
 			public float GetRoundTime()
 			{
-				return Time.time - roundStart;
+				if(GameState == GameState.Pause) {
+					return roundPause - roundStart;
+				} else {
+					return Time.time - roundStart;
+				}
 			}
 			
 			public float GetTimeLeft()
@@ -197,6 +236,11 @@ namespace Assets.Scripts.Game
 				}
 				
 				return GameLogic.Instance.Players[CurrentPlayer];
+			}
+
+			public int GetPlayersCount()
+			{
+				return GameLogic.Instance.Players.Count;
 			}
 
 			public void SetGameState(GameState state)

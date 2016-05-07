@@ -19,7 +19,7 @@ public class PlayerStatistics : MonoBehaviour {
 		if(Player != null) 
 		{
 			PlayerNameText.text = Player.name;
-			MoneyText.text = Player.Money.ToString();
+			MoneyText.text = Player.Money.GetAmount().ToString();
 		}
 	}
 

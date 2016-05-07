@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+	public UIController UIController;
+
     // MonoBehavior methods
     //***********************************
     void Update ()
@@ -44,7 +46,9 @@ public class GameController : MonoBehaviour
         {
 			Player player = GameLogic.Instance.CurrentRound.GetCurrentPlayer();
 			Field field = GameLogic.Instance.CurrentRound.GetCurrentPlayer().CurrentField;
-            GameLogic.Instance.BuyField(player, field);
+
+			GameLogic.Instance.RequestTrade(player, new Money(field.Price) , field.Owner, field);
         }
     }
+
 }

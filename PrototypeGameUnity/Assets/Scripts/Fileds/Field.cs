@@ -3,12 +3,13 @@ using Assets.Scripts.Game;
 using UnityEngine;
 
 [RequireComponent(typeof(FieldBounds))]
-public class Field : MonoBehaviour
+public class Field : MonoBehaviour, ITradeable
 {
     public int Id { get; private set; }
     public Player Owner { get; private set; }
     public int Price = 100;
     public TextMesh Text;
+	public Sprite FieldCard;
 
     private FieldBounds _bounds;
     public FieldBounds Bounds
@@ -64,7 +65,18 @@ public class Field : MonoBehaviour
     public void SetOwner(Player player)
     {
         Owner = player;
-        Text.text = Owner.name + " owns this field.";
+		if(Text != null)
+		{
+			if(Owner != null)
+			{
+				Text.text = Owner.name + " owns this field.";
+			}
+			else
+			{
+				Text.text = "Press ENTER to buy this field.";
+			}
+		}
+
     }
 
     public void SetFieldName(string name)
@@ -109,4 +121,35 @@ public class Field : MonoBehaviour
     }
 
     #endregion
+
+	#region ITradeable methods
+	public int GetAmount()
+	{
+		return 1;
+	}
+
+	public Sprite GetSprite()
+	{
+		return FieldCard;
+	}
+
+	public void GiveToPlayer(Player player, int amount)
+	{
+		if(Owner != null)
+		{
+			TakeFromPlayer(Owner, amount);
+		}
+		player.Items.Add (this);
+		SetOwner(player);
+	}
+	
+	public void TakeFromPlayer(Player player, int amount)
+	{
+		if(Owner != null)
+		{
+			Owner.Items.Remove(this);
+			SetOwner(null);
+		}
+	}
+	#endregion	
 }

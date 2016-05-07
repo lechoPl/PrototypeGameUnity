@@ -1,4 +1,5 @@
 using Assets.Scripts.Game;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerController))]
@@ -9,10 +10,12 @@ public class Player : MonoBehaviour
     public PlayerController Controller { get; private set; }
     private PlayerMark playerMark;
 
-    public int Money = 500;
-    public Field CurrentField { get; set; }
+	public Money Money;
+	public IList<ITradeable> Items;
+	public IList<Message> Messages;
 
-
+    public Field CurrentField { get; set; } 
+	
     #region MonoBehavior methods
     //***********************************
 
@@ -21,6 +24,17 @@ public class Player : MonoBehaviour
         playerMark = GetComponentInChildren<PlayerMark>();
 
         Controller = GetComponent<PlayerController>();
+
+		Money = new Money(500);
+		
+		Items = new List<ITradeable>();
+
+		Messages = new List<Message>();
+
+		/*for(int i=0; i<10; i++) {
+			
+			Messages.Add (new Message("Title " + i, "Description " + i));
+		}*/
 
         GameLogic.Instance.RegisterPlayer(this);
     }
@@ -37,8 +51,6 @@ public class Player : MonoBehaviour
 
     #endregion
 
-
-
     #region Public methods
     //***********************************
 
@@ -52,6 +64,18 @@ public class Player : MonoBehaviour
         Id = id;
         SetupPlayerMark();
     }
+
+	public bool Has(Money money)
+	{
+		return Money.GetAmount() >= money.GetAmount();
+	}
+
+	public bool Has(ITradeable item)
+	{
+		if(item is Money) return Has (item as Money);
+
+		return Items.Contains(item);
+	}
 
     #endregion
 

@@ -17,9 +17,9 @@ public class UIController : MonoBehaviour
     //***********************************
     void Update()
     {
-        CheckInput();
         ShowHidePlayerStats();
         RefreshTimer();
+		RefreshPlayerStats();
     }
 
     // Private methods
@@ -52,11 +52,6 @@ public class UIController : MonoBehaviour
         return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    private void CheckInput()
-    {
-        
-    }
-
     public void ShowBoard()
     {
         Board.SetActive(!Board.activeSelf);
@@ -66,4 +61,19 @@ public class UIController : MonoBehaviour
     {
         Board.SetActive(show);
     }
+
+	private void RefreshPlayerStats()
+	{
+		print (transform.childCount);
+		for(int i=0; i<PlayerStatsPanel.transform.childCount; i++)
+		{
+			if(i < GameLogic.Instance.CurrentRound.GetPlayersCount())
+			{
+				PlayerStatistics playerStatistics = PlayerStatsPanel.transform.GetChild(i).gameObject.GetComponent(typeof(PlayerStatistics)) as PlayerStatistics;
+				playerStatistics.SetPlayer(GameLogic.Instance.GetPlayer(i));
+			}
+			PlayerStatsPanel.transform.GetChild(i).gameObject.SetActive(i < GameLogic.Instance.CurrentRound.GetPlayersCount());
+		}
+	}
+
 }

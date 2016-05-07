@@ -16,7 +16,7 @@ public class DiceScript : MonoBehaviour
         new Vector3(280, -10, 0),
         new Vector3(10, -10, 0),
         new Vector3(100, -10, 0),
-        new Vector3(-190, -10, 0),
+        new Vector3(-10, 170, 0),
         new Vector3(0, -100, -10),
         new Vector3(0, 80, 10)
     };

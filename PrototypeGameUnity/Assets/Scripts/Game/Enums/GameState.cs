@@ -3,6 +3,7 @@
     public enum GameState
     {
         Menu,
-        Move
+        Move,
+		Pause
     }
 }
