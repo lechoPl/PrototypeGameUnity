@@ -6,6 +6,9 @@ using Assets.Scripts.Common;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
+    public GameObject PlayerModel;
+    private Animator PlayerAnimator;
+
     [Header("Physics")]
     public float Speed = 10f;
     public float jumpForce = 700f;
@@ -34,6 +37,8 @@ public class PlayerController : MonoBehaviour
 
         _lastMove = Input.GetAxis("Horizontal");
         _lastPosition = transform.position;
+
+        PlayerAnimator = PlayerModel.GetComponent<Animator>();
     }
 
     void FixedUpdate()
@@ -48,6 +53,7 @@ public class PlayerController : MonoBehaviour
         {
             _lastMove = _lastMove + 100f; // to fix bug after reset velocity;
             jumpCount = 0;
+            PlayerAnimator.SetBool("IsFlying", false);
         }
 
         float move = Input.GetAxis("Horizontal");
@@ -56,6 +62,16 @@ public class PlayerController : MonoBehaviour
         {
             _rigidbody.velocity = new Vector2(move * Speed, _rigidbody.velocity.y);
         }
+
+        if(move < 0)
+        {
+            PlayerModel.transform.rotation = Quaternion.Euler(0, -90, 0);
+        } else if(move > 0)
+        {
+            PlayerModel.transform.rotation = Quaternion.Euler(0, 90, 0);
+        }
+        
+        PlayerAnimator.SetBool("IsWalking", move != 0);
 
         _lastPosition = transform.position;
         _lastMove = move;
@@ -71,6 +87,11 @@ public class PlayerController : MonoBehaviour
         if ((isGrounded || jumpCount < maxJumpCount - 1) && Input.GetButtonDown("Jump"))
         {
             Jump();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            PlayerAnimator.SetTrigger("Fire");
         }
     }
 
@@ -96,6 +117,9 @@ public class PlayerController : MonoBehaviour
     //***********************************
     private void Jump()
     {
+        PlayerAnimator.SetTrigger("Jump");
+        PlayerAnimator.SetBool("IsFlying", true);
+
         isGrounded = false;
         ++jumpCount;
         _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 0f);
