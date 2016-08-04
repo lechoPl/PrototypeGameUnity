@@ -168,7 +168,7 @@ namespace Assets.Scripts.Game
 		{
 			public GameState GameState { get; internal set; }
 			
-			private static int DiceTimeMultiplier = 3;
+			private static int DiceTimeMultiplier = 30;
 
 			private float roundStart = 0;
 			private float roundPause = 0;

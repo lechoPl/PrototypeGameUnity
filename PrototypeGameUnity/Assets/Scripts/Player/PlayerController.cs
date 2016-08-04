@@ -7,6 +7,7 @@ using Assets.Scripts.Common;
 public class PlayerController : MonoBehaviour
 {
     public GameObject PlayerModel;
+    public GameObject Bullet;
     private Animator PlayerAnimator;
 
     [Header("Physics")]
@@ -53,7 +54,6 @@ public class PlayerController : MonoBehaviour
         {
             _lastMove = _lastMove + 100f; // to fix bug after reset velocity;
             jumpCount = 0;
-            PlayerAnimator.SetBool("IsFlying", false);
         }
 
         float move = Input.GetAxis("Horizontal");
@@ -65,10 +65,10 @@ public class PlayerController : MonoBehaviour
 
         if(move < 0)
         {
-            PlayerModel.transform.rotation = Quaternion.Euler(0, -90, 0);
+            PlayerModel.transform.rotation = Quaternion.Euler(0, -120, 0);
         } else if(move > 0)
         {
-            PlayerModel.transform.rotation = Quaternion.Euler(0, 90, 0);
+            PlayerModel.transform.rotation = Quaternion.Euler(0, 120, 0);
         }
         
         PlayerAnimator.SetBool("IsWalking", move != 0);
@@ -84,6 +84,11 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        if(isGrounded)
+        {
+            PlayerAnimator.SetBool("IsFlying", false);
+        }
+
         if ((isGrounded || jumpCount < maxJumpCount - 1) && Input.GetButtonDown("Jump"))
         {
             Jump();
@@ -91,7 +96,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
-            PlayerAnimator.SetTrigger("Fire");
+            Fire();
         }
     }
 
@@ -117,13 +122,23 @@ public class PlayerController : MonoBehaviour
     //***********************************
     private void Jump()
     {
-        PlayerAnimator.SetTrigger("Jump");
         PlayerAnimator.SetBool("IsFlying", true);
+        PlayerAnimator.SetTrigger("Jump");
 
         isGrounded = false;
         ++jumpCount;
         _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 0f);
         _rigidbody.AddForce(new Vector2(0f, jumpForce));
+    }
+
+    private void Fire()
+    {
+        PlayerAnimator.SetTrigger("Fire");
+        PlayerAnimator.SetBool("IsShootingRight", !PlayerAnimator.GetBool("IsShootingRight"));
+
+        GameObject shellInstance =
+            Instantiate(Bullet, Bullet.transform.position, Bullet.transform.rotation) as GameObject;
+        shellInstance.SetActive(true);       
     }
 
     private bool CanPlayerMove()

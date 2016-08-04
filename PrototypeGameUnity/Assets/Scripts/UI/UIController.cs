@@ -64,7 +64,6 @@ public class UIController : MonoBehaviour
 
 	private void RefreshPlayerStats()
 	{
-		print (transform.childCount);
 		for(int i=0; i<PlayerStatsPanel.transform.childCount; i++)
 		{
 			if(i < GameLogic.Instance.CurrentRound.GetPlayersCount())
